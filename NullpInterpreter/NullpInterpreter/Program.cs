@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using NullPInterpreter.Interpreter;
+using System.Diagnostics;
 
 namespace NullPInterpreter
 {
