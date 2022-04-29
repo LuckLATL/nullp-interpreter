@@ -12,6 +12,7 @@ namespace NullPInterpreter.Interpreter
         {
             new Token(TokenType.KeywordNamespace, "namespace"),
             new Token(TokenType.KeywordIfStatement, "if"),
+            new Token(TokenType.KeywordElseStatement, "else"),
             new Token(TokenType.KeywordVariable, "var"),
             new Token(TokenType.KeywordFunction, "function")
         };

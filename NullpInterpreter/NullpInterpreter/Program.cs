@@ -1,5 +1,7 @@
 ﻿using NullPInterpreter.Interpreter;
+using NullPInterpreter.Interpreter.AST;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace NullPInterpreter
 {
@@ -12,18 +14,14 @@ namespace NullPInterpreter
             Console.WriteLine("Starting Parser...");
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            Lexer lexer = new Lexer(content);
+            Parser parser = new Parser(new Lexer(content));
 
-            Token currentToken = lexer.GetNextToken();
-            while (currentToken.Type != TokenType.EoF)
-            {
-                Console.WriteLine(currentToken.Value + $"\t[{currentToken.Type}]");
-                currentToken = lexer.GetNextToken();
-            }
+            ASTNode node = parser.Parse();
 
             stopwatch.Stop();
             Console.WriteLine($"Finished in {stopwatch.ElapsedMilliseconds}ms");
-
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(node, Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText("output.txt", json);
             Console.ReadLine();
 
         }

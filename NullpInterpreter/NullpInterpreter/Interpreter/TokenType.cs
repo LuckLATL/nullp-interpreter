@@ -10,6 +10,7 @@ namespace NullPInterpreter.Interpreter
     {
         KeywordVariable,                            
         StringLiteral,                            
+        IntegerLiteral,
         Plus,                               // The plus operator '+'
         Minus,                              // The minus operator '-'
         Multiply,                           // The star operator '*'
@@ -29,6 +30,8 @@ namespace NullPInterpreter.Interpreter
         Equals,
         NotEquals,
         KeywordFunction,
+        NamespacePropertyCall,
+        Comma,
         FunctionCall                        // Calling a function
     }
 }

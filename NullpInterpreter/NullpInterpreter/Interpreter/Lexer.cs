@@ -13,6 +13,8 @@ namespace NullPInterpreter.Interpreter
         /// </summary>
         public int Position { get; private set; } = 0;
         public int Line { get; private set; } = 1;
+        public int LastPositionLineStart { get; private set; } = 0;
+        public int LinePosition { get { return Position - LastPositionLineStart + 1; } }
         /// <summary>
         /// Text the Lexer is processing
         /// </summary>
@@ -43,7 +45,10 @@ namespace NullPInterpreter.Interpreter
                 currentCharacter = text[Position];
 
             if (currentCharacter == '\n')
+            {
+                LastPositionLineStart = Position;
                 Line++;
+            }
         }
 
         private char Peek()
@@ -105,7 +110,7 @@ namespace NullPInterpreter.Interpreter
                 }
             }
 
-            return new Token(TokenType.KeywordVariable, Convert.ToDouble(result));
+            return new Token(TokenType.IntegerLiteral, Convert.ToDouble(result));
         }
 
         private Token GetWord()
@@ -120,6 +125,12 @@ namespace NullPInterpreter.Interpreter
             if (currentCharacter == '(')
             {
                 Token t = new Token(TokenType.FunctionCall, result);
+                return t;
+            }
+
+            if (currentCharacter == '.')
+            {
+                Token t = new Token(TokenType.NamespacePropertyCall, result);
                 return t;
             }
 
@@ -221,6 +232,9 @@ namespace NullPInterpreter.Interpreter
                     case '.':
                         Advance();
                         return new Token(TokenType.Dot, '.');
+                    case ',':
+                        Advance();
+                        return new Token(TokenType.Comma, ',');
                     case '"':
                         return GetStringLiteral();
                     default:
