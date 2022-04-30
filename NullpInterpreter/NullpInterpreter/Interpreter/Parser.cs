@@ -143,7 +143,14 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode Variable()
         {
-            ASTNode node = new Variable(currentToken, currentToken.Value);
+            ASTNode node = new Variable(currentToken, currentToken.Value.ToString());
+            ConsumeCurrentToken(TokenType.Word);
+            return node;
+        }
+
+        private ASTNode Argument()
+        {
+            ASTNode node = new Argument(currentToken, currentToken.Value.ToString());
             ConsumeCurrentToken(TokenType.Word);
             return node;
         }
@@ -211,13 +218,13 @@ namespace NullPInterpreter.Interpreter
 
             while (currentToken.Type != TokenType.RightParenthesis)
             {
-                node.Arguments.Add(Variable());
+                node.Arguments.Add((Argument)Argument());
 
                 if (currentToken.Type != TokenType.RightParenthesis)
                     ConsumeCurrentToken(TokenType.Comma);
             }
             ConsumeCurrentToken(TokenType.RightParenthesis);
-            node.Block = Block();
+            node.Block = (Block)Block();
 
             return node;
         }
@@ -229,12 +236,12 @@ namespace NullPInterpreter.Interpreter
             ConsumeCurrentToken(TokenType.LeftParenthesis);
             node.BooleanExpression = BooleanExpression();
             ConsumeCurrentToken(TokenType.RightParenthesis);
-            node.Block = Block();
+            node.Block = (Block)Block();
 
             if (currentToken.Type == TokenType.KeywordElseStatement)
             {
                 ConsumeCurrentToken(TokenType.KeywordElseStatement);
-                node.ElseBlock = Block();
+                node.ElseBlock = (Block)Block();
             }
 
             return node;
@@ -282,7 +289,7 @@ namespace NullPInterpreter.Interpreter
         private VariableDeclaration VariableDeclaration()
         {
             ConsumeCurrentToken(TokenType.KeywordVariable);
-            Variable variable = new Variable(currentToken, currentToken.Value);
+            Variable variable = new Variable(currentToken, currentToken.Value.ToString());
             ConsumeCurrentToken(TokenType.Word);
             VariableDeclaration declaration = new VariableDeclaration(variable);
 
@@ -350,7 +357,7 @@ namespace NullPInterpreter.Interpreter
                 throw new Exception("Programm didn't terminate correctly.");
             }
 
-            ASTNode root = new RootElement() { Children = nodes };
+            ASTNode root = new ProgramElement() { Children = nodes };
             return root;
         }
     }

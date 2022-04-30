@@ -9,8 +9,8 @@ namespace NullPInterpreter.Interpreter.AST
     public class IfStatement : ASTNode
     {
         public ASTNode BooleanExpression { get; set; }
-        public ASTNode Block { get; set; }
-        public ASTNode ElseBlock { get; set; }
+        public Block Block { get; set; }
+        public Block ElseBlock { get; set; } = new Block();
 
     }
 }

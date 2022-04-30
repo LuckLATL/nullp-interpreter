@@ -13,15 +13,13 @@ namespace NullPInterpreter
             Console.WriteLine("============================================");
             Console.WriteLine("Starting Parser...");
             Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            Parser parser = new Parser(new Lexer(content));
-
-            ASTNode node = parser.Parse();
-
+            Interpreter.Interpreter interpreter = new Interpreter.Interpreter(new Parser(new Lexer(content)));
+            interpreter.Prepare();
+            //interpreter.Interpret();
             stopwatch.Stop();
             Console.WriteLine($"Finished in {stopwatch.ElapsedMilliseconds}ms");
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(node, Newtonsoft.Json.Formatting.Indented);
-            File.WriteAllText("output.txt", json);
+            //string json = Newtonsoft.Json.JsonConvert.SerializeObject(node, Newtonsoft.Json.Formatting.Indented);
+            //File.WriteAllText("output.txt", json);
             Console.ReadLine();
 
         }

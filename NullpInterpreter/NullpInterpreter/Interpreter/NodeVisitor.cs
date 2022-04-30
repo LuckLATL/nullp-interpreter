@@ -11,39 +11,60 @@ namespace NullPInterpreter.Interpreter
     {
         public object Visit(ASTNode node)
         {
-            if (node is BinaryOperator)
-                return VisitBinaryOperation((BinaryOperator)node);
-            else if (node is UnaryOperator)
-                return VisitUnaryOperator((UnaryOperator)node);
-            else if (node is AssignmentOperator)
-                return VisitAssignmentOperator((AssignmentOperator)node);
-            else if (node is Variable)
-                return VisitVariable((Variable)node);
-            else if (node is NoOperator)
-                return VisitNoOperator((NoOperator)node);
-            else if (node is NamespaceDeclaration)
-                return VisitNamespace((NamespaceDeclaration)node);
-            else if (node is Block)
-                return VisitBlock((Block)node);
-            else if (node is VariableDeclaration)
-                return VisitVariableDeclaration((VariableDeclaration)node);
-            else if (node is FunctionCall)
-                return VisitFunctionCall((FunctionCall)node);
-            else if (node is IfStatement)
-                return VisitIfStatement((IfStatement)node);
+            switch (node)
+            {
+                case AssignmentOperator n:
+                    return VisitAssignmentOperator(n);
+                case BinaryOperator n:
+                    return VisitBinaryOperator(n);
+                case Block n:
+                    return VisitBlock(n);
+                case BooleanExpression n:
+                    return VisitBooleanExpression(n);
+                case FunctionCall n:
+                    return VisitFunctionCall(n);
+                case FunctionDeclaration n:
+                    return VisitFunctionDeclaration(n);
+                case IfStatement n:
+                    return VisitIfStatement(n);
+                case IntegerLiteral n:
+                    return VisitIntegerLiteral(n);
+                case NamespaceDeclaration n:
+                    return VisitNamespaceDeclaration(n);
+                case NamespacePropertyCall n:
+                    return VisitNamespacePropertyCall(n);
+                case NoOperator n:
+                    return VisitNoOperator(n);
+                case ProgramElement n:
+                    return VisitProgramElement(n);
+                case StringLiteral n:
+                    return VisitStringLiteral(n);
+                case UnaryOperator n:
+                    return VisitUnaryOperator(n);
+                case Variable n:
+                    return VisitVariable(n);
+                case VariableDeclaration n:
+                    return VisitVariableDeclaration(n);
+            }
 
-                throw new Exception("Unsupported type");
+            throw new Exception("Unsupported type");
         }
 
-        protected abstract object VisitIfStatement(IfStatement node);
-        protected abstract object VisitFunctionCall(FunctionCall node);
-        protected abstract object VisitVariableDeclaration(VariableDeclaration node);
-        protected abstract object VisitBlock(Block node);
-        protected abstract object VisitNamespace(NamespaceDeclaration node);
-        protected abstract object VisitNoOperator(NoOperator node);
-        protected abstract object VisitVariable(Variable node);
-        protected abstract object VisitAssignmentOperator(AssignmentOperator node);
-        protected abstract object VisitUnaryOperator(UnaryOperator node);
-        protected abstract object VisitBinaryOperation(BinaryOperator node);
+        protected abstract object VisitVariableDeclaration(VariableDeclaration n);
+        protected abstract object VisitVariable(Variable n);
+        protected abstract object VisitUnaryOperator(UnaryOperator n);
+        protected abstract object VisitStringLiteral(StringLiteral n);
+        protected abstract object VisitProgramElement(ProgramElement n);
+        protected abstract object VisitNoOperator(NoOperator n);
+        protected abstract object VisitNamespacePropertyCall(NamespacePropertyCall n);
+        protected abstract object VisitNamespaceDeclaration(NamespaceDeclaration n);
+        protected abstract object VisitIntegerLiteral(IntegerLiteral n);
+        protected abstract object VisitIfStatement(IfStatement n);
+        protected abstract object VisitFunctionDeclaration(FunctionDeclaration n);
+        protected abstract object VisitFunctionCall(FunctionCall n);
+        protected abstract object VisitBooleanExpression(BooleanExpression n);
+        protected abstract object VisitBlock(Block n);
+        protected abstract object VisitBinaryOperator(BinaryOperator n);
+        protected abstract object VisitAssignmentOperator(AssignmentOperator n);
     }
 }

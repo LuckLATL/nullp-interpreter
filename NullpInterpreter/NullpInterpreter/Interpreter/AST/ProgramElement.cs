@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NullPInterpreter.Interpreter.AST
 {
-    internal class RootElement : ASTNode
+    public class ProgramElement : ASTNode
     {
         public List<ASTNode> Children { get; set; } = new List<ASTNode>();
     }
