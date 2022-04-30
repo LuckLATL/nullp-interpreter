@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,8 @@ namespace NullPInterpreter.Interpreter
 {
     public enum TokenType
     {
-        KeywordVariable,                            
-        StringLiteral,                            
+        KeywordVariable,
+        StringLiteral,
         IntegerLiteral,
         Plus,                               // The plus operator '+'
         Minus,                              // The minus operator '-'
@@ -33,5 +34,66 @@ namespace NullPInterpreter.Interpreter
         NamespacePropertyCall,
         Comma,
         FunctionCall                        // Calling a function
+    }
+
+    public class TokenTypeExtension
+    {
+        public static string TokenTypeToReadableString(TokenType tokenType)
+        {
+            switch (tokenType)
+            {
+                case TokenType.KeywordVariable:
+                    return "var";
+                case TokenType.StringLiteral:
+                    return "string";
+                case TokenType.IntegerLiteral:
+                    return "integer";
+                case TokenType.Plus:
+                    return "+";
+                case TokenType.Minus:
+                    return "-";
+                case TokenType.Multiply:
+                    return "*";
+                case TokenType.Divide:
+                    return "/";
+                case TokenType.EoF:
+                    return "End of File";
+                case TokenType.LeftParenthesis:
+                    return "(";
+                case TokenType.RightParenthesis:
+                    return ")";
+                case TokenType.Assign:
+                    return "=";
+                case TokenType.Semicolon:
+                    return ";";
+                case TokenType.Dot:
+                    return ".";
+                case TokenType.Word:
+                    return "word";
+                case TokenType.BlockOpen:
+                    return "{";
+                case TokenType.BlockClose:
+                    return "}";
+                case TokenType.KeywordNamespace:
+                    return "namespace";
+                case TokenType.KeywordIfStatement:
+                    return "if";
+                case TokenType.KeywordElseStatement:
+                    return "else";
+                case TokenType.Equals:
+                    return "==";
+                case TokenType.NotEquals:
+                    return "!=";
+                case TokenType.KeywordFunction:
+                    return "function";
+                case TokenType.NamespacePropertyCall:
+                    return "namespace property";
+                case TokenType.Comma:
+                    return ",";
+                case TokenType.FunctionCall:
+                    return "function call";
+            }
+            return "[not found]";
+        }
     }
 }

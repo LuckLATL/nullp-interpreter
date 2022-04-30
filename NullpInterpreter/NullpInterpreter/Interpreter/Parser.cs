@@ -1,5 +1,6 @@
 ﻿using NullPInterpreter.Interpreter;
 using NullPInterpreter.Interpreter.AST;
+using NullPInterpreter.Interpreter.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace NullPInterpreter.Interpreter
                 currentToken = lexer.GetNextToken();
             else
                 // Throw an exception as the input didn't match the output
-                throw new Exception($"Syntax Error at position {lexer.LinePosition} line {lexer.Line}! Expected {expectedTokenType} but got {currentToken.Type}.");
+                throw new SyntaxError(lexer.Line, lexer.LinePosition, $"Read token '{currentToken.Value}' did not match expected token '{TokenTypeExtension.TokenTypeToReadableString(expectedTokenType)}'.");
         }
 
         private List<ASTNode> StatementList()
@@ -138,7 +139,7 @@ namespace NullPInterpreter.Interpreter
                 return result;
             }
 
-            throw new Exception($"Syntax Error at positon {lexer.Position} on line {lexer.Line}.");
+            throw new SyntaxError(lexer.Line, lexer.LinePosition, "Expression does not validate to known possible operations.");
         }
 
         private ASTNode Variable()
@@ -352,9 +353,10 @@ namespace NullPInterpreter.Interpreter
         public ASTNode Parse()
         {
             List<ASTNode> nodes = StatementList();
+
             if (currentToken.Type != TokenType.EoF)
             {
-                throw new Exception("Programm didn't terminate correctly.");
+                throw new SyntaxError(lexer.Line, lexer.LinePosition, "Programm didn't terminate correctly.");
             }
 
             ASTNode root = new ProgramElement() { Children = nodes };

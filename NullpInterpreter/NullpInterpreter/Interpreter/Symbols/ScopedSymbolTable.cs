@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NullPInterpreter.Interpreter.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace NullPInterpreter.Interpreter.Symbols
         public void AddSymbol(Symbol symbol)
         {
             if (symbols.ContainsKey(symbol.Name))
-                throw new Exception($"Symbol with the name '{symbol.Name}' has already been declared");
+                throw new DuplicateIdentifierError($"Symbol with the name '{symbol.Name}' has already been declared.");
             symbols[symbol.Name] = symbol;
         }
 
@@ -42,7 +43,7 @@ namespace NullPInterpreter.Interpreter.Symbols
             {
                 if (EnclosingScope == null)
                 {
-                    throw new Exception($"Symbol with the name '{symbolName}' has not been declared");
+                    throw new InvalidIdentifierError($"Symbol with the name '{symbolName}' has not been declared.");
                 }
                 else
                 {

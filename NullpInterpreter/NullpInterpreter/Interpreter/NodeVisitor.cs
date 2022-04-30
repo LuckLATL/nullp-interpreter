@@ -11,6 +11,9 @@ namespace NullPInterpreter.Interpreter
     {
         public object Visit(ASTNode node)
         {
+            if (node == null)
+                return null;
+
             switch (node)
             {
                 case AssignmentOperator n:

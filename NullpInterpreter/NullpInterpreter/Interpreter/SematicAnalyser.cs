@@ -41,6 +41,7 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitVariableDeclaration(VariableDeclaration n)
         {
+            Visit(n.InitialDefinition);
             currentScope.AddSymbol(new Symbol() { Name = n.Variable.Name, Type = SymbolType.Variable });
             return null;
         }
@@ -54,14 +55,10 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitFunctionDeclaration(FunctionDeclaration n)
         {
             currentScope.AddSymbol(new Symbol() { Name = n.FunctionName, Type = SymbolType.Function });
-            Console.WriteLine($"Enter Scope: {n.FunctionName}");
             currentScope = new ScopedSymbolTable(n.FunctionName, currentScope.ScopeLevel + 1, currentScope);
 
             n.Arguments.ForEach(argument => currentScope.AddSymbol(new Symbol { Name = argument.Name, Type = SymbolType.Argument }));
             Visit(n.Block);
-
-            Console.WriteLine(currentScope);
-            Console.WriteLine($"Leave scope: {n.FunctionName}");
             currentScope = currentScope.EnclosingScope;
 
             return null;
@@ -83,13 +80,10 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitNamespaceDeclaration(NamespaceDeclaration n)
         {
             currentScope.AddSymbol(new Symbol() { Name = n.Name, Type = SymbolType.Namespace });
-            Console.WriteLine($"Enter Scope: {n.Name}");
             currentScope = new ScopedSymbolTable(n.Name, currentScope.ScopeLevel + 1, currentScope);
 
             Visit(n.Block);
 
-            Console.WriteLine(currentScope);
-            Console.WriteLine($"Leave scope: {n.Name}");
             currentScope = currentScope.EnclosingScope;
 
             return null;

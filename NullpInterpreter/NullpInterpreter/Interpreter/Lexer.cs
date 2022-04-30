@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NullPInterpreter.Interpreter.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -225,7 +226,7 @@ namespace NullPInterpreter.Interpreter
                             Advance();
                             return new Token(TokenType.NotEquals, "!=");
                         }
-                        throw new Exception($"Invalid comparision on line {Line} position {Position}");
+                        throw new SyntaxError(Line, LinePosition, "Given comparision operator is not valid.");
                     case ';':
                         Advance();
                         return new Token(TokenType.Semicolon, ';');
@@ -241,7 +242,7 @@ namespace NullPInterpreter.Interpreter
                         break;
                 }
                 // None of the tokens match :(
-                throw new Exception($"Invalid language token at position {Position} on line {Line}.");
+                throw new SyntaxError(Line, LinePosition, $"Invalid language token.");
             }
             // No more tokens to process => End of File/Line
             return new Token(TokenType.EoF, null);
