@@ -1,4 +1,5 @@
 ﻿using NullPInterpreter.Interpreter.AST;
+using NullPInterpreter.Interpreter.CallStackManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace NullPInterpreter.Interpreter
         public Parser Parser { get; set; }
 
         public SematicAnalyser SematicAnalyser { get; set; } = new SematicAnalyser();
+
+        CallStack CallStack = new CallStack();
 
         public Interpreter(Parser parser)
         {
@@ -33,42 +36,126 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitAssignmentOperator(AssignmentOperator n)
         {
-            throw new NotImplementedException();
+            CallStack.Peek().SetMember(((Variable)n.LeftNode).Name, Visit(n.RightNode));
+            return null;
         }
 
         protected override object VisitBinaryOperator(BinaryOperator n)
         {
-            throw new NotImplementedException();
+            object leftNode = Visit(n.LeftNode);
+            object rightNode = Visit(n.RightNode);
+
+            if (leftNode is string || rightNode is string)
+            {
+                if (n.Operator.Type == TokenType.Plus)
+                {
+                    return leftNode.ToString() + rightNode.ToString();
+                }
+                throw new InvalidOperationException();
+            }
+            else
+            {
+                if (!(leftNode is double && rightNode is double))
+                    throw new Exception("bruh, you stupid because only double can be added");
+
+                double leftDouble = (double)leftNode;
+                double rightDouble = (double)rightNode;
+
+                switch (n.Operator.Type)
+                {
+                    case TokenType.Plus:
+                        return leftDouble + rightDouble;
+                    case TokenType.Minus:
+                        return leftDouble - rightDouble;
+                    case TokenType.Multiply:
+                        return leftDouble * rightDouble;
+                    case TokenType.Divide:
+                        if (rightDouble == 0)
+                            throw new Exception("Stupid by 0 division");
+                        return leftDouble / rightDouble;
+                }
+            }
+            return null;
         }
 
         protected override object VisitBlock(Block n)
         {
-            throw new NotImplementedException();
+            n.Children.ForEach(child => Visit(child));
+            return null;
         }
 
         protected override object VisitBooleanExpression(BooleanExpression n)
         {
-            throw new NotImplementedException();
+            object leftResult = Visit(n.Left);
+            object rightResult = Visit(n.Right);
+
+            switch (n.Operator)
+            {
+                case TokenType.Equals:
+                    return leftResult.Equals(rightResult);
+                case TokenType.NotEquals:
+                    return !leftResult.Equals(rightResult);
+            }
+            throw new Exception("cannot compare");
         }
 
         protected override object VisitVariableDeclaration(VariableDeclaration n)
         {
-            throw new NotImplementedException();
+            if (n.InitialDefinition != null)
+            {
+                CallStack.Peek().SetMember(n.Variable.Name, Visit(n.InitialDefinition));
+            }
+            return null;
         }
 
         protected override object VisitFunctionCall(FunctionCall n)
         {
-            throw new NotImplementedException();
+            object returnValue;
+
+            if (BuiltInFunctions.CheckIfBuiltInFunction(n.FunctionName))
+            {
+                List<object> args = new List<object>();
+
+                foreach (var argument in n.Arguments)
+                {
+                    args.Add(Visit(argument));
+                }
+
+                returnValue = BuiltInFunctions.ExecuteBuiltInFunction(n.FunctionName, args);
+            }
+            else
+            {
+                ActivationRecord ar = new ActivationRecord(n.FunctionName, ActivationRecordType.Function, 2);
+                CallStack.ExtendedPush(ar);
+
+                for (int i = 0; i < n.Arguments.Count; i++)
+                {
+                    ar.SetMember(n.FunctionSymbol.Declaration.Arguments[i].Name, Visit(n.Arguments[i]));
+                }
+
+                returnValue = Visit(n.FunctionSymbol.Declaration.Block);
+                CallStack.Pop();
+            }
+
+            return returnValue;
         }
 
         protected override object VisitFunctionDeclaration(FunctionDeclaration n)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         protected override object VisitIfStatement(IfStatement n)
         {
-            throw new NotImplementedException();
+            if ((bool)Visit(n.BooleanExpression))
+            {
+                Visit(n.Block);
+            }
+            else
+            {
+                Visit(n.ElseBlock);
+            }
+            return null;
         }
 
         protected override object VisitIntegerLiteral(IntegerLiteral n)
@@ -78,22 +165,26 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitNamespaceDeclaration(NamespaceDeclaration n)
         {
-            throw new NotImplementedException();
+            Visit(n.Block);
+            return null;
         }
 
         protected override object VisitNamespacePropertyCall(NamespacePropertyCall n)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("This feature has not been implemented yet");
         }
 
         protected override object VisitNoOperator(NoOperator n)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         protected override object VisitProgramElement(ProgramElement n)
         {
-            throw new NotImplementedException();
+            CallStack.ExtendedPush(new ActivationRecord("Program", ActivationRecordType.Program, 1));
+            n.Children.ForEach(child => Visit(child));
+            CallStack.Pop();
+            return null;
         }
 
         protected override object VisitStringLiteral(StringLiteral n)
@@ -103,12 +194,12 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitUnaryOperator(UnaryOperator n)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         protected override object VisitVariable(Variable n)
         {
-            throw new NotImplementedException();
+            return CallStack.Peek().GetMember(n.Name);
         }
     }
 }

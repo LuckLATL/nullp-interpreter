@@ -11,14 +11,12 @@ namespace NullPInterpreter
         static void Main(string[] args)
         {
             string content = File.ReadAllText(@"code-file.nullp");
-            Console.WriteLine("============================================");
-            Console.WriteLine("Starting Parser...");
             Stopwatch stopwatch = new Stopwatch();
             try
             {
                 Interpreter.Interpreter interpreter = new Interpreter.Interpreter(new Parser(new Lexer(content)));
                 interpreter.Prepare();
-                //interpreter.Interpret();
+                interpreter.Interpret();
             }
             catch (SyntaxError ex)
             {

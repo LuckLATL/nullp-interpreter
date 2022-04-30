@@ -26,8 +26,8 @@ namespace NullPInterpreter.Interpreter.Symbols
 
         public void InitializeBuiltIns()
         {
-            symbols.Add("WriteLine", new Symbol() { Name = "WriteLine", Type = SymbolType.Function });
-            symbols.Add("ReadLine", new Symbol() { Name = "ReadLine", Type = SymbolType.Function });
+            symbols.Add("WriteLine", new FunctionSymbol() { Name = "WriteLine", Type = SymbolType.Function });
+            symbols.Add("ReadLine", new FunctionSymbol() { Name = "ReadLine", Type = SymbolType.Function });
         }
 
         public void AddSymbol(Symbol symbol)

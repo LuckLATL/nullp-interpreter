@@ -48,13 +48,17 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitFunctionCall(FunctionCall n)
         {
-            currentScope.LookUpSymbol(n.FunctionName);
+            object obj = currentScope.LookUpSymbol(n.FunctionName);
+            n.FunctionSymbol = (FunctionSymbol)obj;
+            foreach (ASTNode node in n.Arguments)
+                Visit(node);
             return null;
         }
 
         protected override object VisitFunctionDeclaration(FunctionDeclaration n)
         {
-            currentScope.AddSymbol(new Symbol() { Name = n.FunctionName, Type = SymbolType.Function });
+            FunctionSymbol fsymb = new FunctionSymbol() { Name = n.FunctionName, Type = SymbolType.Function, Declaration = n };
+            currentScope.AddSymbol(fsymb);
             currentScope = new ScopedSymbolTable(n.FunctionName, currentScope.ScopeLevel + 1, currentScope);
 
             n.Arguments.ForEach(argument => currentScope.AddSymbol(new Symbol { Name = argument.Name, Type = SymbolType.Argument }));
@@ -92,6 +96,7 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitNamespacePropertyCall(NamespacePropertyCall n)
         {
             currentScope.LookUpSymbol(n.CallerName);
+            Visit(n.CalledNode);
             return null;
         }
 
@@ -102,14 +107,11 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitProgramElement(ProgramElement n)
         {
-            Console.WriteLine("Enter Scope: Program");
             currentScope = new ScopedSymbolTable("Program", 1);
             currentScope.InitializeBuiltIns();
 
             n.Children.ForEach(child => Visit(child));
 
-            Console.WriteLine(currentScope);
-            Console.WriteLine("Leave Scope: Program");
             currentScope = currentScope.EnclosingScope;
             return null;
         }

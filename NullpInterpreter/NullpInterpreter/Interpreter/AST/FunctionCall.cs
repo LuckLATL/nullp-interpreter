@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NullPInterpreter.Interpreter.Symbols;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace NullPInterpreter.Interpreter.AST
     {
         public string FunctionName { get; set; }
         public List<ASTNode> Arguments { get; set; } = new List<ASTNode>();
+        public FunctionSymbol FunctionSymbol { get; set; }
 
         public FunctionCall(string functionName)
         {
