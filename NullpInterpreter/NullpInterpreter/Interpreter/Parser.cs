@@ -203,8 +203,13 @@ namespace NullPInterpreter.Interpreter
             {
                 node = IfStatement();
             }
-            else
+            else if (currentToken.Type == TokenType.Semicolon)
+            {
                 node = new NoOperator();
+                ConsumeCurrentToken(TokenType.Semicolon);
+            }
+            else
+                throw new SyntaxError(lexer.Line, lexer.LinePosition, $"Unexpected token '{TokenTypeExtension.TokenTypeToReadableString(currentToken.Type)}' found.");
 
             return node;
         }
