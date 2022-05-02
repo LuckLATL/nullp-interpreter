@@ -27,13 +27,13 @@ function ExecuteCode(fruit)
     var answer = ReadLine();
     // Write an if statement					
     if (answer == "Yes")						
-	{
-		WriteLine("Good, here is your " + fruit + ".");					
-	}
-	else											
-	{
-		WriteLine("Okay then, no " + fruit + " for you.");
-	}
+    {
+        WriteLine("Good, here is your " + fruit + ".");					
+    }
+    else											
+    {
+        WriteLine("Okay then, no " + fruit + " for you.");
+    }
 }
 
 function Main()							
