@@ -21,12 +21,12 @@ NULLP is a made up programming language created for the only purpose to test out
 // Define function with parameters
 function ExecuteCode(fruit)			
 {
-	// Print something to the console
-	WriteLine("Do you want an " + fruit + "?");
+    // Print something to the console
+    WriteLine("Do you want an " + fruit + "?");
     // Read a string from the console
-	var answer = ReadLine();
+    var answer = ReadLine();
     // Write an if statement					
-	if (answer == "Yes")						
+    if (answer == "Yes")						
 	{
 		WriteLine("Good, here is your " + fruit + ".");					
 	}
@@ -39,7 +39,7 @@ function ExecuteCode(fruit)
 function Main()							
 {
     // Call functions from an other function
-	ExecuteCode("apple");					
+    ExecuteCode("apple");					
 }
 
 // Execute code
