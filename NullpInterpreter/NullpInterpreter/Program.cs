@@ -10,20 +10,42 @@ namespace NullPInterpreter
     {
         static void Main(string[] args)
         {
+            Console.Title = "NULLP Interpreter";
+
             while (true)
             {
                 Console.Clear();
-                string content = File.ReadAllText(@"code-file.nullp");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine($" NULLP - Interpreter / {DateTime.Now.ToShortDateString()}");
+                Console.WriteLine("");
                 Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                string content = File.ReadAllText(@"code-file.nullp");
                 try
                 {
-                    Parser p = new Parser(new Lexer(content));
-                    Console.WriteLine("Parser");
+                    Console.Write(" Lexer\t\t\t\t");
+                    Lexer lexer = new Lexer(content);
+                    WriteStatusToConsole(stopwatch);
+
+
+                    Console.Write(" Parser\t\t\t\t");
+                    Parser p = new Parser(lexer);
+                    ASTNode rootNode = p.Parse();
+                    WriteStatusToConsole(stopwatch);
+
                     Interpreter.Interpreter interpreter = new Interpreter.Interpreter(p);
-                    Console.WriteLine("sem an");
-                    interpreter.Prepare();
-                    Console.WriteLine("int");
+
+                    Console.Write(" Sematic Analyser\t\t");
+                    interpreter.SematicAnalysis(rootNode);
+                    WriteStatusToConsole(stopwatch);
+
+                    stopwatch.Stop();
+                    Console.WriteLine("");
+                    Console.WriteLine(" Starting Program - Good Luck Captain!");
+                    Console.WriteLine("");
+                    Console.ResetColor();
                     interpreter.Interpret();
+
                 }
                 catch (SyntaxError ex)
                 {
@@ -50,13 +72,22 @@ namespace NullPInterpreter
                     Console.ResetColor();
                 }
 
-                stopwatch.Stop();
-                Console.WriteLine($"Finished in {stopwatch.ElapsedMilliseconds}ms");
-                //string json = Newtonsoft.Json.JsonConvert.SerializeObject(node, Newtonsoft.Json.Formatting.Indented);
-                //File.WriteAllText("output.txt", json);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine();
+                Console.WriteLine(" Program Executed - Press Enter To Restart");
                 Console.ReadLine();
             }
 
+        }
+
+        private static void WriteStatusToConsole(Stopwatch sw)
+        {
+            Console.Write("[");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("OK");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"] / ({sw.ElapsedMilliseconds}ms)");
+            sw.Restart();
         }
     }
 }

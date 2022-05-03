@@ -10,7 +10,7 @@ namespace NullPInterpreter.Interpreter
 {
     public class SematicAnalyser : NodeVisitor
     {
-        ScopedSymbolTable currentScope = null;
+        public ScopedSymbolTable CurrentScope { get; set; } = null;
 
         protected override object VisitAssignmentOperator(AssignmentOperator n)
         {
@@ -42,13 +42,13 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitVariableDeclaration(VariableDeclaration n)
         {
             Visit(n.InitialDefinition);
-            currentScope.AddSymbol(new Symbol() { Name = n.Variable.Name, Type = SymbolType.Variable });
+            CurrentScope.AddSymbol(new Symbol() { Name = n.Variable.Name, Type = SymbolType.Variable });
             return null;
         }
 
         protected override object VisitFunctionCall(FunctionCall n)
         {
-            object obj = currentScope.LookUpSymbol(n.FunctionName);
+            object obj = CurrentScope.LookUpSymbol(n.FunctionName);
             n.FunctionSymbol = (FunctionSymbol)obj;
             foreach (ASTNode node in n.Arguments)
                 Visit(node);
@@ -58,12 +58,12 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitFunctionDeclaration(FunctionDeclaration n)
         {
             FunctionSymbol fsymb = new FunctionSymbol() { Name = n.FunctionName, Type = SymbolType.Function, Declaration = n };
-            currentScope.AddSymbol(fsymb);
-            currentScope = new ScopedSymbolTable(n.FunctionName, currentScope.ScopeLevel + 1, currentScope);
+            CurrentScope.AddSymbol(fsymb);
+            CurrentScope = new ScopedSymbolTable(n.FunctionName, CurrentScope.ScopeLevel + 1, CurrentScope);
 
-            n.Arguments.ForEach(argument => currentScope.AddSymbol(new Symbol { Name = argument.Name, Type = SymbolType.Argument }));
+            n.Arguments.ForEach(argument => CurrentScope.AddSymbol(new Symbol { Name = argument.Name, Type = SymbolType.Argument }));
             Visit(n.Block);
-            currentScope = currentScope.EnclosingScope;
+            CurrentScope = CurrentScope.EnclosingScope;
 
             return null;
         }
@@ -83,19 +83,19 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitNamespaceDeclaration(NamespaceDeclaration n)
         {
-            currentScope.AddSymbol(new Symbol() { Name = n.Name, Type = SymbolType.Namespace });
-            currentScope = new ScopedSymbolTable(n.Name, currentScope.ScopeLevel + 1, currentScope);
+            CurrentScope.AddSymbol(new Symbol() { Name = n.Name, Type = SymbolType.Namespace });
+            CurrentScope = new ScopedSymbolTable(n.Name, CurrentScope.ScopeLevel + 1, CurrentScope);
 
             Visit(n.Block);
 
-            currentScope = currentScope.EnclosingScope;
+            CurrentScope = CurrentScope.EnclosingScope;
 
             return null;
         }
 
         protected override object VisitNamespacePropertyCall(NamespacePropertyCall n)
         {
-            currentScope.LookUpSymbol(n.CallerName);
+            CurrentScope.LookUpSymbol(n.CallerName);
             Visit(n.CalledNode);
             return null;
         }
@@ -107,12 +107,12 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitProgramElement(ProgramElement n)
         {
-            currentScope = new ScopedSymbolTable("Program", 1);
-            currentScope.InitializeBuiltIns();
+            CurrentScope = new ScopedSymbolTable("Program", 1);
+            CurrentScope.InitializeBuiltIns();
 
             n.Children.ForEach(child => Visit(child));
 
-            currentScope = currentScope.EnclosingScope;
+            CurrentScope = CurrentScope.EnclosingScope;
             return null;
         }
 
@@ -129,13 +129,20 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitVariable(Variable n)
         {
-            currentScope.LookUpSymbol(n.Name);
+            CurrentScope.LookUpSymbol(n.Name);
             return null;
         }
 
         protected override object VisitReturnStatement(ReturnStatement n)
         {
             Visit(n.ReturnNode);
+            return null;
+        }
+
+        protected override object VisitFunctionForwardDeclaration(FunctionForwardDeclaration n)
+        {
+            FunctionSymbol fsymb = new FunctionSymbol() { Name = n.Name, Type = SymbolType.Function, Declaration = null };
+            CurrentScope.AddSymbol(fsymb);
             return null;
         }
     }

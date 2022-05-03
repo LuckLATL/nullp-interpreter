@@ -222,22 +222,35 @@ namespace NullPInterpreter.Interpreter
         private ASTNode FunctionDeclaration()
         {
             ConsumeCurrentToken(TokenType.KeywordFunction);
-            FunctionDeclaration node = new FunctionDeclaration();
-            node.FunctionName = currentToken.Value.ToString();
-            ConsumeCurrentToken(TokenType.FunctionCall);
-            ConsumeCurrentToken(TokenType.LeftParenthesis);
 
-            while (currentToken.Type != TokenType.RightParenthesis)
+            if (currentToken.Type == TokenType.Word) // Function forward declaration
             {
-                node.Arguments.Add((Argument)Argument());
-
-                if (currentToken.Type != TokenType.RightParenthesis)
-                    ConsumeCurrentToken(TokenType.Comma);
+                FunctionForwardDeclaration node = new FunctionForwardDeclaration();
+                node.Name = currentToken.Value.ToString();
+                ConsumeCurrentToken(TokenType.Word);
+                ConsumeCurrentToken(TokenType.Semicolon);
+                return node;
             }
-            ConsumeCurrentToken(TokenType.RightParenthesis);
-            node.Block = (Block)Block();
+            else
+            {
+                FunctionDeclaration node = new FunctionDeclaration();
+                node.FunctionName = currentToken.Value.ToString();
+                ConsumeCurrentToken(TokenType.FunctionCall);
+                ConsumeCurrentToken(TokenType.LeftParenthesis);
 
-            return node;
+                while (currentToken.Type != TokenType.RightParenthesis)
+                {
+                    node.Arguments.Add((Argument)Argument());
+
+                    if (currentToken.Type != TokenType.RightParenthesis)
+                        ConsumeCurrentToken(TokenType.Comma);
+                }
+                ConsumeCurrentToken(TokenType.RightParenthesis);
+                node.Block = (Block)Block();
+                return node;
+            }
+
+            throw new SyntaxError(lexer.Line, lexer.LinePosition, $"Unexpected token '{currentToken.Type}' found on function declaration.");
         }
 
         private ASTNode IfStatement()

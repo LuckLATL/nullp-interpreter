@@ -23,9 +23,9 @@ namespace NullPInterpreter.Interpreter
 
         public ProgramElement rootNode;
 
-        public void Prepare()
+        public void SematicAnalysis(ASTNode _rootNode)
         {
-            rootNode = (ProgramElement)Parser.Parse();
+            rootNode = (ProgramElement)_rootNode;
             SematicAnalyser.Visit(rootNode);
         }
 
@@ -136,7 +136,7 @@ namespace NullPInterpreter.Interpreter
             }
             else
             {
-                ActivationRecord ar = new ActivationRecord(n.FunctionName, ActivationRecordType.Function, 2);
+                ActivationRecord ar = new ActivationRecord(n.FunctionName, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
                 CallStack.ExtendedPush(ar);
 
                 for (int i = 0; i < n.Arguments.Count; i++)
@@ -193,7 +193,7 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitProgramElement(ProgramElement n)
         {
-            CallStack.ExtendedPush(new ActivationRecord("Program", ActivationRecordType.Program, 1));
+            CallStack.ExtendedPush(new ActivationRecord("Program", ActivationRecordType.Program, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1));
             n.Children.ForEach(child => Visit(child));
             CallStack.Pop();
             return null;
@@ -217,6 +217,11 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitReturnStatement(ReturnStatement n)
         {
             return Visit(n.ReturnNode);
+        }
+
+        protected override object VisitFunctionForwardDeclaration(FunctionForwardDeclaration n)
+        {
+            return null;
         }
     }
 }

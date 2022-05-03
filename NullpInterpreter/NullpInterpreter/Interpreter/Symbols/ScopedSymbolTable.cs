@@ -33,7 +33,12 @@ namespace NullPInterpreter.Interpreter.Symbols
         public void AddSymbol(Symbol symbol)
         {
             if (symbols.ContainsKey(symbol.Name))
-                throw new DuplicateIdentifierError($"Symbol with the name '{symbol.Name}' has already been declared.");
+            {
+                if (symbol.Type == SymbolType.Function && symbols[symbol.Name].Type == SymbolType.Function && (symbols[symbol.Name] as FunctionSymbol).Declaration == null)
+                    ((FunctionSymbol)symbols[symbol.Name]).Declaration = ((FunctionSymbol)symbol).Declaration;
+                else
+                    throw new DuplicateIdentifierError($"Symbol with the name '{symbol.Name}' has already been declared.");
+            }
             symbols[symbol.Name] = symbol;
         }
 

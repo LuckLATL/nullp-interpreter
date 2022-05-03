@@ -50,11 +50,14 @@ namespace NullPInterpreter.Interpreter
                     return VisitReturnStatement(n);
                 case VariableDeclaration n:
                     return VisitVariableDeclaration(n);
+                case FunctionForwardDeclaration n:
+                    return VisitFunctionForwardDeclaration(n);
             }
 
             throw new Exception("Unsupported type");
         }
 
+        protected abstract object VisitFunctionForwardDeclaration(FunctionForwardDeclaration n);
         protected abstract object VisitReturnStatement(ReturnStatement n);
         protected abstract object VisitVariableDeclaration(VariableDeclaration n);
         protected abstract object VisitVariable(Variable n);
