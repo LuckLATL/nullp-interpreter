@@ -86,6 +86,15 @@ namespace NullPInterpreter.Interpreter
             Advance();
         }
 
+        private void SkipBlockComment()
+        {
+            while (!(LookBack() == '*' && currentCharacter == '/'))
+            {
+                Advance();
+            }
+            Advance();
+        }
+
         /// <summary>
         /// Gets an full integer from the current position
         /// </summary>
@@ -167,6 +176,12 @@ namespace NullPInterpreter.Interpreter
                 if (currentCharacter == '/' && Peek() == '/')
                 {
                     SkipComment();
+                    continue;
+                }
+
+                if (currentCharacter == '/' && Peek() == '*')
+                {
+                    SkipBlockComment();
                     continue;
                 }
 

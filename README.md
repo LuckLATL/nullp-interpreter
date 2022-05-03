@@ -18,6 +18,15 @@ NULLP is a made up programming language created for the only purpose to test out
 ## Example Program
 
 ```JavaScript
+/* Forward Declaration for Functions */
+function ExecuteCode;
+
+function Main()							
+{
+    // Call functions from an other function
+    WriteLine("Answer was: " + ExecuteCode("apple"));					
+}
+
 // Define function with parameters
 function ExecuteCode(fruit)			
 {
@@ -39,13 +48,7 @@ function ExecuteCode(fruit)
     return answer;
 }
 
-function Main()							
-{
-    // Call functions from an other function
-    WriteLine("Answer was: " + ExecuteCode("apple"));					
-}
-
-// Execute code
+// Execute function
 Main();
 ```
 
@@ -90,6 +93,13 @@ function FunctionName(parameter1, parameter 2, etc)
 #### Call
 ```JavaScript
 FunctionName(param1, "param2", 3, etc);
+```
+
+#### Forward Declaration
+
+```JavaScript
+// Functions can be declared in advance with a forward declaration
+function FunctionThatIsFoundSomewhereBelow;
 ```
 
 ### If-Statement
