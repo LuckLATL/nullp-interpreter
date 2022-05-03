@@ -80,7 +80,18 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitBlock(Block n)
         {
-            n.Children.ForEach(child => Visit(child));
+            foreach (var child in n.Children)
+            {
+                if (CallStack.Peek().ReturnValue != null)
+                    break;
+
+                if (child is ReturnStatement)
+                {
+                    CallStack.Peek().ReturnValue = Visit(child);
+                    return null;
+                }
+                Visit(child);
+            }
             return null;
         }
 
@@ -133,7 +144,8 @@ namespace NullPInterpreter.Interpreter
                     ar.SetMember(n.FunctionSymbol.Declaration.Arguments[i].Name, Visit(n.Arguments[i]));
                 }
 
-                returnValue = Visit(n.FunctionSymbol.Declaration.Block);
+                Visit(n.FunctionSymbol.Declaration.Block);
+                returnValue = ar.ReturnValue;
                 CallStack.Pop();
             }
 
@@ -200,6 +212,11 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitVariable(Variable n)
         {
             return CallStack.Peek().GetMember(n.Name);
+        }
+
+        protected override object VisitReturnStatement(ReturnStatement n)
+        {
+            return Visit(n.ReturnNode);
         }
     }
 }

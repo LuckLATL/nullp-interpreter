@@ -203,6 +203,11 @@ namespace NullPInterpreter.Interpreter
             {
                 node = IfStatement();
             }
+            else if (currentToken.Type == TokenType.KeywordReturn)
+            {
+                node = ReturnStatement();
+                ConsumeCurrentToken(TokenType.Semicolon);
+            }
             else if (currentToken.Type == TokenType.Semicolon)
             {
                 node = new NoOperator();
@@ -263,6 +268,14 @@ namespace NullPInterpreter.Interpreter
             else if (currentToken.Type == TokenType.NotEquals)
                 ConsumeCurrentToken(TokenType.NotEquals);
             node.Right = Expression();
+            return node;
+        }
+
+        private ASTNode ReturnStatement()
+        {
+            ReturnStatement node = new ReturnStatement();
+            ConsumeCurrentToken(TokenType.KeywordReturn);
+            node.ReturnNode = Expression();
             return node;
         }
 

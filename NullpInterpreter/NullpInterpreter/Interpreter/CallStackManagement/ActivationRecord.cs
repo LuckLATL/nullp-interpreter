@@ -12,6 +12,7 @@ namespace NullPInterpreter.Interpreter.CallStackManagement
         public ActivationRecordType Type { get; set; }
         public int NestingLevel { get; set; }
         public Dictionary<string, object> Members { get; set; } = new();
+        public object ReturnValue { get; set; } = null;
 
         public ActivationRecord PreviousRecord { get; set; }
 

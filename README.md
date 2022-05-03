@@ -28,18 +28,21 @@ function ExecuteCode(fruit)
     // Write an if statement					
     if (answer == "Yes")						
     {
-        WriteLine("Good, here is your " + fruit + ".");					
+        WriteLine("Good, here is your " + fruit + ".");
+        return "Yes!";
     }
     else											
     {
         WriteLine("Okay then, no " + fruit + " for you.");
     }
+
+    return answer;
 }
 
 function Main()							
 {
     // Call functions from an other function
-    ExecuteCode("apple");					
+    WriteLine("Answer was: " + ExecuteCode("apple"));					
 }
 
 // Execute code
@@ -78,6 +81,8 @@ variable = FunctionCall();
 function FunctionName(parameter1, parameter 2, etc)
 {
     // Function body here
+    // Optional return statement in functions
+    return varX;
 }
 ```
 

@@ -46,6 +46,8 @@ namespace NullPInterpreter.Interpreter
                     return VisitUnaryOperator(n);
                 case Variable n:
                     return VisitVariable(n);
+                case ReturnStatement n:
+                    return VisitReturnStatement(n);
                 case VariableDeclaration n:
                     return VisitVariableDeclaration(n);
             }
@@ -53,6 +55,7 @@ namespace NullPInterpreter.Interpreter
             throw new Exception("Unsupported type");
         }
 
+        protected abstract object VisitReturnStatement(ReturnStatement n);
         protected abstract object VisitVariableDeclaration(VariableDeclaration n);
         protected abstract object VisitVariable(Variable n);
         protected abstract object VisitUnaryOperator(UnaryOperator n);

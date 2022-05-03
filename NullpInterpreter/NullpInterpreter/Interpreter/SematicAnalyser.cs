@@ -132,5 +132,11 @@ namespace NullPInterpreter.Interpreter
             currentScope.LookUpSymbol(n.Name);
             return null;
         }
+
+        protected override object VisitReturnStatement(ReturnStatement n)
+        {
+            Visit(n.ReturnNode);
+            return null;
+        }
     }
 }

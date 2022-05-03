@@ -43,6 +43,12 @@ namespace NullPInterpreter
                     Console.WriteLine($"Duplicate Identifier Error: {ex.Message}");
                     Console.ResetColor();
                 }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Unknown Error: {ex.Message}");
+                    Console.ResetColor();
+                }
 
                 stopwatch.Stop();
                 Console.WriteLine($"Finished in {stopwatch.ElapsedMilliseconds}ms");
