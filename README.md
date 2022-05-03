@@ -54,6 +54,7 @@ Main();
 Do you want an apple?
 [Yes] > Good, here is your apple.
 [No] > Okay then, no apple for you. 
+Answer was: [Yes! / ...]
 ```
 
 ## Language Features
