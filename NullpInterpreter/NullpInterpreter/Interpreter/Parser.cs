@@ -307,13 +307,19 @@ namespace NullPInterpreter.Interpreter
         private ASTNode BooleanExpression()
         {
             BooleanExpression node = new BooleanExpression();
+
             node.Left = Expression();
             node.Operator = currentToken.Type;
+            bool isStandaloneExpressnion = false; // Means there is only 'true' or 'false' in the expression
             if (currentToken.Type == TokenType.Equals)
                 ConsumeCurrentToken(TokenType.Equals);
             else if (currentToken.Type == TokenType.NotEquals)
                 ConsumeCurrentToken(TokenType.NotEquals);
-            node.Right = Expression();
+            else if (currentToken.Type == TokenType.RightParenthesis)
+                isStandaloneExpressnion = true;
+
+            if (!isStandaloneExpressnion)
+                node.Right = Expression();
             return node;
         }
 

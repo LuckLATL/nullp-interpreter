@@ -49,6 +49,10 @@ namespace NullPInterpreter.Interpreter
             {
                 if (n.Operator.Type == TokenType.Plus)
                 {
+                    if (leftNode == null)
+                        leftNode = "";
+                    if (rightNode == null)
+                        rightNode = "";
                     return leftNode.ToString() + rightNode.ToString();
                 }
                 throw new InvalidOperationException();
@@ -56,7 +60,7 @@ namespace NullPInterpreter.Interpreter
             else
             {
                 if (!(leftNode is double && rightNode is double))
-                    throw new Exception("bruh, you stupid because only double can be added");
+                    throw new Exception("Invalid operation. Tried calculate number with non-number.");
 
                 double leftDouble = (double)leftNode;
                 double rightDouble = (double)rightNode;
@@ -71,7 +75,7 @@ namespace NullPInterpreter.Interpreter
                         return leftDouble * rightDouble;
                     case TokenType.Divide:
                         if (rightDouble == 0)
-                            throw new Exception("Stupid by 0 division");
+                            throw new Exception("Division by 0. Wormhole successfully created. Please stand by while we terminate your code.");
                         return leftDouble / rightDouble;
                 }
             }
@@ -106,8 +110,16 @@ namespace NullPInterpreter.Interpreter
                     return leftResult == rightResult;
                 case TokenType.NotEquals:
                     return leftResult != rightResult;
+                default:
+                    if (rightResult == null)
+                    {
+                        if ((leftResult is double && (double)leftResult == 0.0) || (leftResult is bool && ((bool)leftResult == false)) || leftResult == null)
+                            return false;
+                        return true;
+                    }
+                    break;
             }
-            throw new Exception("cannot compare");
+            throw new Exception($"Invalid operator ('{TokenTypeExtension.TokenTypeToReadableString(n.Operator)}') for boolean expression found.");
         }
 
         protected override object VisitVariableDeclaration(VariableDeclaration n)
