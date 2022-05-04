@@ -24,6 +24,8 @@ namespace NullPInterpreter.Interpreter
             switch (functionName)
             {
                 case "WriteLine":
+                    if (arguments[0] == null)
+                        arguments[0] = "NULL";
                     Console.WriteLine($"[{DateTime.Now}] " + arguments[0].ToString());
                     break;
                 case "ReadLine":

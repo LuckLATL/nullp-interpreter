@@ -138,8 +138,41 @@ namespace NullPInterpreter.Interpreter
                 ASTNode result = FunctionCall();
                 return result;
             }
+            else if (token.Type == TokenType.KeywordFalse)
+            {
+                ASTNode result = FalseLiteral();
+                return result;
+            }
+            else if (token.Type == TokenType.KeywordTrue)
+            {
+                ASTNode result = TrueLiteral();
+                return result;
+            }
+            else if (token.Type == TokenType.KeywordNull)
+            {
+                ASTNode result = NullLiteral();
+                return result;
+            }
 
             throw new SyntaxError(lexer.Line, lexer.LinePosition, "Expression does not validate to known possible operations.");
+        }
+
+        private ASTNode FalseLiteral()
+        {
+            ConsumeCurrentToken(TokenType.KeywordFalse);
+            return new FalseLiteral();
+        }
+
+        private ASTNode TrueLiteral()
+        {
+            ConsumeCurrentToken(TokenType.KeywordTrue);
+            return new TrueLiteral();
+        }
+
+        private ASTNode NullLiteral()
+        {
+            ConsumeCurrentToken(TokenType.KeywordNull);
+            return new NullLiteral();
         }
 
         private ASTNode Variable()

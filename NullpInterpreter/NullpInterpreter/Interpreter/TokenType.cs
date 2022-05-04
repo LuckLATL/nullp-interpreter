@@ -34,6 +34,9 @@ namespace NullPInterpreter.Interpreter
         NamespacePropertyCall,
         Comma,
         KeywordReturn,
+        KeywordTrue,
+        KeywordFalse,
+        KeywordNull,
         FunctionCall                        // Calling a function
     }
 
@@ -93,6 +96,12 @@ namespace NullPInterpreter.Interpreter
                     return ",";
                 case TokenType.KeywordReturn:
                     return "return";
+                case TokenType.KeywordNull:
+                    return "null";
+                case TokenType.KeywordTrue:
+                    return "true";
+                case TokenType.KeywordFalse:
+                    return "false";
                 case TokenType.FunctionCall:
                     return "function call";
             }

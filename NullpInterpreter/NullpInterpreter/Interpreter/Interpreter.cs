@@ -103,9 +103,9 @@ namespace NullPInterpreter.Interpreter
             switch (n.Operator)
             {
                 case TokenType.Equals:
-                    return leftResult.Equals(rightResult);
+                    return leftResult == rightResult;
                 case TokenType.NotEquals:
-                    return !leftResult.Equals(rightResult);
+                    return leftResult != rightResult;
             }
             throw new Exception("cannot compare");
         }
@@ -220,6 +220,21 @@ namespace NullPInterpreter.Interpreter
         }
 
         protected override object VisitFunctionForwardDeclaration(FunctionForwardDeclaration n)
+        {
+            return null;
+        }
+
+        protected override object VisitTrueLiteral(TrueLiteral n)
+        {
+            return true;
+        }
+
+        protected override object VisitFalseLiteral(FalseLiteral n)
+        {
+            return false;
+        }
+
+        protected override object VisitNullLiteral(NullLiteral n)
         {
             return null;
         }

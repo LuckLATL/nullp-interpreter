@@ -145,5 +145,20 @@ namespace NullPInterpreter.Interpreter
             CurrentScope.AddSymbol(fsymb);
             return null;
         }
+
+        protected override object VisitTrueLiteral(TrueLiteral n)
+        {
+            return null;
+        }
+
+        protected override object VisitFalseLiteral(FalseLiteral n)
+        {
+            return null;
+        }
+
+        protected override object VisitNullLiteral(NullLiteral n)
+        {
+            return null;
+        }
     }
 }
