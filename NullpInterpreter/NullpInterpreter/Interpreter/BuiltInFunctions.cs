@@ -26,9 +26,10 @@ namespace NullPInterpreter.Interpreter
                 case "WriteLine":
                     if (arguments[0] == null)
                         arguments[0] = "NULL";
-                    Console.WriteLine($"[{DateTime.Now}] " + arguments[0].ToString());
+                    Console.WriteLine($" [{DateTime.Now}] " + arguments[0].ToString());
                     break;
                 case "ReadLine":
+                    Console.Write(" > ");
                     return Console.ReadLine();
                 default:
                     break;
