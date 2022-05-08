@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NullPInterpreter.Interpreter.CallStackManagement
 {
-    internal class ActivationRecord
+    public class ActivationRecord
     {
         public string Name { get; set; }
         public ActivationRecordType Type { get; set; }

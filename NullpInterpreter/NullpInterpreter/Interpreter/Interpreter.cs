@@ -14,7 +14,8 @@ namespace NullPInterpreter.Interpreter
 
         public SematicAnalyser SematicAnalyser { get; set; } = new SematicAnalyser();
 
-        CallStack CallStack = new CallStack();
+        public CallStack CallStack = new CallStack();
+        public ActivationRecord LastProgramActivationRecord = null;
 
         public Interpreter(Parser parser)
         {
@@ -104,20 +105,18 @@ namespace NullPInterpreter.Interpreter
             object leftResult = Visit(n.Left);
             object rightResult = Visit(n.Right);
 
+            if ((leftResult == null && rightResult != null) || (leftResult != null && rightResult == null))
+                return false;
+
+            if (leftResult == null && rightResult == null)
+                return true;
+
             switch (n.Operator)
             {
                 case TokenType.Equals:
-                    return leftResult == rightResult;
+                    return leftResult.Equals(rightResult);
                 case TokenType.NotEquals:
-                    return leftResult != rightResult;
-                default:
-                    if (rightResult == null)
-                    {
-                        if ((leftResult is double && (double)leftResult == 0.0) || (leftResult is bool && ((bool)leftResult == false)) || leftResult == null)
-                            return false;
-                        return true;
-                    }
-                    break;
+                    return !leftResult.Equals(rightResult);
             }
             throw new Exception($"Invalid operator ('{TokenTypeExtension.TokenTypeToReadableString(n.Operator)}') for boolean expression found.");
         }
@@ -171,7 +170,8 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitIfStatement(IfStatement n)
         {
-            if ((bool)Visit(n.BooleanExpression))
+            bool result = (bool)Visit(n.BooleanExpression);
+            if (result)
             {
                 Visit(n.Block);
             }
@@ -207,7 +207,7 @@ namespace NullPInterpreter.Interpreter
         {
             CallStack.ExtendedPush(new ActivationRecord("Program", ActivationRecordType.Program, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1));
             n.Children.ForEach(child => Visit(child));
-            CallStack.Pop();
+            LastProgramActivationRecord = CallStack.Pop();
             return null;
         }
 
