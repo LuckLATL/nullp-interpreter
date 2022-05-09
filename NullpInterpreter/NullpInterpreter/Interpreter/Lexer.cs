@@ -126,7 +126,7 @@ namespace NullPInterpreter.Interpreter
         private Token GetWord()
         {
             string result = "";
-            while (currentCharacter != '\0' && char.IsLetterOrDigit(currentCharacter))
+            while (currentCharacter != '\0' && (char.IsLetterOrDigit(currentCharacter) || currentCharacter == '_'))
             {
                 result += currentCharacter;
                 Advance();
@@ -192,7 +192,7 @@ namespace NullPInterpreter.Interpreter
                     continue;
                 }
 
-                if (char.IsLetter(currentCharacter))
+                if (char.IsLetter(currentCharacter) || currentCharacter == '_')
                     return GetWord();
 
                 // Check if the current character is an digit. If so, return a new integer token
