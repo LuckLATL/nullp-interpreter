@@ -30,6 +30,8 @@ namespace NullPInterpreter.Interpreter
                     return VisitFunctionDeclaration(n);
                 case IfStatement n:
                     return VisitIfStatement(n);
+                case WhileStatement n:
+                    return VisitWhileStatement(n);
                 case IntegerLiteral n:
                     return VisitIntegerLiteral(n);
                 case NamespaceDeclaration n:
@@ -71,6 +73,7 @@ namespace NullPInterpreter.Interpreter
             throw new Exception("Unsupported type");
         }
 
+        protected abstract object VisitWhileStatement(WhileStatement n);
         protected abstract object VisitIndexer(Indexer n);
         protected abstract object VisitList(List n);
         protected abstract object VisitClassInstanceCreation(ClassInstanceCreation n);

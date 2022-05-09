@@ -18,6 +18,7 @@ namespace NullPInterpreter.Interpreter
             new Token(TokenType.KeywordVariable, "var"),
             new Token(TokenType.KeywordFunction, "function"),
             new Token(TokenType.KeywordReturn, "return"),
+            new Token(TokenType.KeywordWhile, "while"),
             new Token(TokenType.KeywordNull, "null"),
             new Token(TokenType.KeywordFalse, "false"),
             new Token(TokenType.KeywordTrue, "true")

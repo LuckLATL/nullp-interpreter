@@ -29,6 +29,7 @@ namespace NullPInterpreter.Interpreter
         KeywordClass,
         KeywordIfStatement,
         KeywordElseStatement,
+        KeywordWhile,
         Equals,
         NotEquals,
         KeywordFunction,
@@ -114,6 +115,8 @@ namespace NullPInterpreter.Interpreter
                     return "[";
                 case TokenType.RightSquareBracket:
                     return "]";
+                case TokenType.KeywordWhile:
+                    return "while";
                 case TokenType.FunctionCall:
                     return "function call";
             }

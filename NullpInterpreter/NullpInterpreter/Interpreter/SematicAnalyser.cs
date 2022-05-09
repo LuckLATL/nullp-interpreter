@@ -194,5 +194,12 @@ namespace NullPInterpreter.Interpreter
             Visit(n.Variable);
             return null;
         }
+
+        protected override object VisitWhileStatement(WhileStatement n)
+        {
+            Visit(n.BooleanExpression);
+            Visit(n.Block);
+            return null;
+        }
     }
 }

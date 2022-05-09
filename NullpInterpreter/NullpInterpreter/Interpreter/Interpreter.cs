@@ -88,12 +88,13 @@ namespace NullPInterpreter.Interpreter
         {
             foreach (var child in n.Children)
             {
-                if (CallStack.Peek().ReturnValue != null)
+                if (CallStack.Peek().ShouldReturn)
                     break;
 
                 if (child is ReturnStatement)
                 {
                     CallStack.Peek().ReturnValue = Visit(child);
+                    CallStack.Peek().ShouldReturn = true;
                     return null;
                 }
                 Visit(child);
@@ -105,6 +106,9 @@ namespace NullPInterpreter.Interpreter
         {
             object leftResult = Visit(n.Left);
             object rightResult = Visit(n.Right);
+
+            if (leftResult is bool && rightResult == null)
+                return leftResult;
 
             if ((leftResult == null && rightResult != null) || (leftResult != null && rightResult == null))
                 return false;
@@ -371,6 +375,18 @@ namespace NullPInterpreter.Interpreter
             }
 
             throw new Exception($"'{n.Variable.Name}' is not indexable.");
+        }
+
+        protected override object VisitWhileStatement(WhileStatement n)
+        {
+            while ((bool)Visit(n.BooleanExpression))
+            {
+                Visit(n.Block);
+                if (CallStack.Peek().ShouldReturn)
+                    break;
+            }
+
+            return null;
         }
     }
 }

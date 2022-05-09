@@ -305,6 +305,10 @@ namespace NullPInterpreter.Interpreter
             {
                 node = IfStatement();
             }
+            else if (currentToken.Type == TokenType.KeywordWhile)
+            {
+                node = WhileStatement();
+            }
             else if (currentToken.Type == TokenType.KeywordReturn)
             {
                 node = ReturnStatement();
@@ -326,6 +330,18 @@ namespace NullPInterpreter.Interpreter
             }
             else
                 throw new SyntaxError(lexer.Line, lexer.LinePosition, $"Unexpected token '{TokenTypeExtension.TokenTypeToReadableString(currentToken.Type)}' found.");
+
+            return node;
+        }
+
+        private ASTNode WhileStatement()
+        {
+            WhileStatement node = new WhileStatement();
+            ConsumeCurrentToken(TokenType.KeywordWhile);
+            ConsumeCurrentToken(TokenType.LeftParenthesis);
+            node.BooleanExpression = BooleanExpression();
+            ConsumeCurrentToken(TokenType.RightParenthesis);
+            node.Block = (Block)Block();
 
             return node;
         }

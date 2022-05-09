@@ -13,6 +13,7 @@ namespace NullPInterpreter.Interpreter.CallStackManagement
         public int NestingLevel { get; set; }
         public Dictionary<string, object> Members { get; set; } = new();
         public object ReturnValue { get; set; } = null;
+        public bool ShouldReturn { get; set; } = false;
 
         public ActivationRecord PreviousRecord { get; set; }
 
