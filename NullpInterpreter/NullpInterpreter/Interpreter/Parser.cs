@@ -158,6 +158,11 @@ namespace NullPInterpreter.Interpreter
                 ASTNode result = ClassInstanceCreation();
                 return result;
             }
+            else if (token.Type == TokenType.NamespacePropertyCall)
+            {
+                ASTNode result = NamespacePropertyCall();
+                return result;
+            }
 
             throw new SyntaxError(lexer.Line, lexer.LinePosition, "Expression does not validate to known possible operations.");
         }

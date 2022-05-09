@@ -197,7 +197,17 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitNamespacePropertyCall(NamespacePropertyCall n)
         {
             if (n.CalledNode is NamespacePropertyCall)
-                return Visit(n.CalledNode);
+            {
+                object calledObj = CallStack.Peek().GetMember(n.CallerName);
+
+                if (calledObj is ClassSymbol calledClass)
+                {
+                    CallStack.ExtendedPush(calledClass.ClassActivationRecord);
+                    object returnValue = Visit(n.CalledNode);
+                    CallStack.Pop();
+                    return returnValue;
+                }
+            }
             else if (n.CalledNode is FunctionCall)
             {
                 object calledObj = CallStack.Peek().GetMember(n.CallerName);
@@ -226,8 +236,18 @@ namespace NullPInterpreter.Interpreter
                 }
 
             }
+            else if (n.CalledNode is Variable)
+            {
+                object calledObj = CallStack.Peek().GetMember(n.CallerName);
 
-            return null;
+                if (calledObj is ClassSymbol)
+                {
+                    ClassSymbol calledClass = (ClassSymbol)calledObj;
+
+                    return calledClass.ClassActivationRecord.GetMember(((Variable)n.CalledNode).Name);
+                }
+
+            }
             throw new NotImplementedException("This feature has not been implemented yet");
         }
 
