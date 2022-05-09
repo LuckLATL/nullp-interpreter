@@ -464,13 +464,34 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode AssigmentStatement()
         {
-            ASTNode left = Variable();
-            Token token = currentToken;
-            ConsumeCurrentToken(TokenType.Assign);
-            ASTNode right;
-            right = Expression();
+            Variable left = (Variable)Variable();
+            ASTNode node = null;
+            ASTNode right = null;
+            Token token = new Token(TokenType.Assign, '=');
 
-            ASTNode node = new AssignmentOperator(left, token, right);
+            // Assign like normal
+            if (currentToken.Type == TokenType.Assign)
+            {
+                ConsumeCurrentToken(TokenType.Assign);
+                right = Expression();
+            }
+            // Assign variable to itself + 1
+            else if (currentToken.Type == TokenType.Plus)
+            {
+                ConsumeCurrentToken(TokenType.Plus);
+                ConsumeCurrentToken(TokenType.Plus);
+
+                right = new BinaryOperator(left, new Token(TokenType.Plus, '+'), new IntegerLiteral(1));
+            }
+            else if (currentToken.Type == TokenType.Minus)
+            {
+                ConsumeCurrentToken(TokenType.Minus);
+                ConsumeCurrentToken(TokenType.Minus);
+
+                right = new BinaryOperator(left, new Token(TokenType.Minus, '-'), new IntegerLiteral(1));
+            }
+
+            node = new AssignmentOperator(left, token, right);
             return node;
         }
 
