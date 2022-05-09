@@ -18,6 +18,11 @@ namespace NullPInterpreter.Interpreter.CallStackManagement
 
         public void SetMember(string memberName, object memberValue)
         {
+            if (GetMember(memberName) != null && !Members.ContainsKey(memberName))
+            {
+                PreviousRecord.SetMember(memberName, memberValue);
+                return;
+            }
             Members[memberName] = memberValue;
         }
 

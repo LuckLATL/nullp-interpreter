@@ -153,6 +153,11 @@ namespace NullPInterpreter.Interpreter
                 ASTNode result = NullLiteral();
                 return result;
             }
+            else if (token.Type == TokenType.KeywordNew)
+            {
+                ASTNode result = ClassInstanceCreation();
+                return result;
+            }
 
             throw new SyntaxError(lexer.Line, lexer.LinePosition, "Expression does not validate to known possible operations.");
         }
@@ -241,13 +246,45 @@ namespace NullPInterpreter.Interpreter
                 node = ReturnStatement();
                 ConsumeCurrentToken(TokenType.Semicolon);
             }
+            else if (currentToken.Type == TokenType.KeywordClass)
+            {
+                node = ClassDeclaration();
+            }
             else if (currentToken.Type == TokenType.Semicolon)
             {
                 node = new NoOperator();
                 ConsumeCurrentToken(TokenType.Semicolon);
             }
+            else if (currentToken.Type == TokenType.KeywordNew)
+            {
+                node = ClassInstanceCreation();
+                ConsumeCurrentToken(TokenType.Semicolon);
+            }
             else
                 throw new SyntaxError(lexer.Line, lexer.LinePosition, $"Unexpected token '{TokenTypeExtension.TokenTypeToReadableString(currentToken.Type)}' found.");
+
+            return node;
+        }
+
+        private ASTNode ClassDeclaration()
+        {
+            ConsumeCurrentToken(TokenType.KeywordClass);
+            string className = currentToken.Value.ToString();
+            ConsumeCurrentToken(TokenType.Word);
+            ClassDeclaration classNode = new ClassDeclaration((Block)Block(), className);
+            return classNode;
+        }
+
+        private ASTNode ClassInstanceCreation()
+        {
+            ConsumeCurrentToken(TokenType.KeywordNew);
+
+            ClassInstanceCreation node = new ClassInstanceCreation();
+
+            if (currentToken.Type == TokenType.NamespacePropertyCall)
+                throw new NotImplementedException();
+            else if (currentToken.Type == TokenType.FunctionCall)
+                node.ClassToCreate = (FunctionCall)FunctionCall();
 
             return node;
         }

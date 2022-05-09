@@ -56,6 +56,10 @@ namespace NullPInterpreter.Interpreter
                     return VisitNullLiteral(n);
                 case FalseLiteral n:
                     return VisitFalseLiteral(n);
+                case ClassDeclaration n:
+                    return VisitClassDeclaration(n);
+                case ClassInstanceCreation n:
+                    return VisitClassInstanceCreation(n);
                 case TrueLiteral n:
                     return VisitTrueLiteral(n);
             }
@@ -63,6 +67,8 @@ namespace NullPInterpreter.Interpreter
             throw new Exception("Unsupported type");
         }
 
+        protected abstract object VisitClassInstanceCreation(ClassInstanceCreation n);
+        protected abstract object VisitClassDeclaration(ClassDeclaration n);
         protected abstract object VisitTrueLiteral(TrueLiteral n);
         protected abstract object VisitFalseLiteral(FalseLiteral n);
         protected abstract object VisitNullLiteral(NullLiteral n);

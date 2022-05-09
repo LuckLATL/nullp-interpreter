@@ -96,7 +96,7 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitNamespacePropertyCall(NamespacePropertyCall n)
         {
             CurrentScope.LookUpSymbol(n.CallerName);
-            Visit(n.CalledNode);
+            //Visit(n.CalledNode);
             return null;
         }
 
@@ -158,6 +158,25 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitNullLiteral(NullLiteral n)
         {
+            return null;
+        }
+
+        protected override object VisitClassInstanceCreation(ClassInstanceCreation n)
+        {
+            object obj = CurrentScope.LookUpSymbol(n.ClassToCreate.FunctionName);
+            n.ClassSymbol = (ClassSymbol)obj;
+            return null;
+        }
+
+        protected override object VisitClassDeclaration(ClassDeclaration n)
+        {
+            ClassSymbol csymb = new ClassSymbol() { Name = n.Name, Type = SymbolType.Class, Declaration = n };
+            CurrentScope.AddSymbol(csymb);
+            CurrentScope = csymb.ClassSymbols = new ScopedSymbolTable(n.Name, CurrentScope.ScopeLevel + 1, CurrentScope);
+            
+            Visit(n.Block);
+            CurrentScope = CurrentScope.EnclosingScope;
+
             return null;
         }
     }

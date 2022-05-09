@@ -11,8 +11,10 @@ namespace NullPInterpreter.Interpreter
         public static List<Token> Keywords { get; set; } = new List<Token>()
         {
             new Token(TokenType.KeywordNamespace, "namespace"),
+            new Token(TokenType.KeywordClass, "class"),
             new Token(TokenType.KeywordIfStatement, "if"),
             new Token(TokenType.KeywordElseStatement, "else"),
+            new Token(TokenType.KeywordNew, "new"),
             new Token(TokenType.KeywordVariable, "var"),
             new Token(TokenType.KeywordFunction, "function"),
             new Token(TokenType.KeywordReturn, "return"),

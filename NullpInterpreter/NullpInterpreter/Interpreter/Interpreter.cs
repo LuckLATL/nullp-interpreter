@@ -1,5 +1,6 @@
 ﻿using NullPInterpreter.Interpreter.AST;
 using NullPInterpreter.Interpreter.CallStackManagement;
+using NullPInterpreter.Interpreter.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -195,6 +196,38 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitNamespacePropertyCall(NamespacePropertyCall n)
         {
+            if (n.CalledNode is NamespacePropertyCall)
+                return Visit(n.CalledNode);
+            else if (n.CalledNode is FunctionCall)
+            {
+                object calledObj = CallStack.Peek().GetMember(n.CallerName);
+
+                if (calledObj is ClassSymbol)
+                {
+                    ClassSymbol calledClass = (ClassSymbol)calledObj;
+
+                    FunctionSymbol func = ((FunctionSymbol)(calledClass.ClassSymbols.LookUpSymbol(((FunctionCall)n.CalledNode).FunctionName)));
+
+                    ActivationRecord ar = new ActivationRecord(func.Name, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
+                    CallStack.ExtendedPush(calledClass.ClassActivationRecord);
+                    CallStack.ExtendedPush(ar);
+
+                    for (int i = 0; i < func.Declaration.Arguments.Count; i++)
+                    {
+                        ar.SetMember(func.Declaration.Arguments[i].Name, Visit((n.CalledNode as FunctionCall).Arguments[i]));
+                    }
+
+                    Visit(func.Declaration.Block);
+
+                    CallStack.Pop();
+                    CallStack.Pop();
+
+                    return ar.ReturnValue;
+                }
+
+            }
+
+            return null;
             throw new NotImplementedException("This feature has not been implemented yet");
         }
 
@@ -247,6 +280,27 @@ namespace NullPInterpreter.Interpreter
         }
 
         protected override object VisitNullLiteral(NullLiteral n)
+        {
+            return null;
+        }
+
+        protected override object VisitClassInstanceCreation(ClassInstanceCreation n)
+        {
+            ActivationRecord ar = new ActivationRecord(n.ClassSymbol.Name, ActivationRecordType.Class, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
+            CallStack.ExtendedPush(ar);
+            n.ClassSymbol.ClassActivationRecord = ar;
+            Visit(n.ClassSymbol.Declaration.Block);
+
+            FunctionSymbol constructor = n.ClassSymbol.ClassSymbols.LookUpSymbol(n.ClassSymbol.Name) as FunctionSymbol;
+            if (constructor != null)
+                Visit(constructor.Declaration.Block);
+
+            CallStack.Pop();
+
+            return n.ClassSymbol;
+        }
+
+        protected override object VisitClassDeclaration(ClassDeclaration n)
         {
             return null;
         }

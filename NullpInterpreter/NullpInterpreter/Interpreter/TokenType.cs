@@ -26,6 +26,7 @@ namespace NullPInterpreter.Interpreter
         BlockOpen,                          // Block open '{'
         BlockClose,                         // Block close '}'
         KeywordNamespace,                   // Program header
+        KeywordClass,
         KeywordIfStatement,
         KeywordElseStatement,
         Equals,
@@ -37,6 +38,7 @@ namespace NullPInterpreter.Interpreter
         KeywordTrue,
         KeywordFalse,
         KeywordNull,
+        KeywordNew,
         FunctionCall                        // Calling a function
     }
 
@@ -102,6 +104,10 @@ namespace NullPInterpreter.Interpreter
                     return "true";
                 case TokenType.KeywordFalse:
                     return "false";
+                case TokenType.KeywordClass:
+                    return "class";
+                case TokenType.KeywordNew:
+                    return "new";
                 case TokenType.FunctionCall:
                     return "function call";
             }
