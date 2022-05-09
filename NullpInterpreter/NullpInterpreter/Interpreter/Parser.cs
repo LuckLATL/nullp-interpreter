@@ -20,6 +20,8 @@ namespace NullPInterpreter.Interpreter
         /// </summary>
         private Token currentToken = null;
 
+        private Token previousToken = null;
+
         public Parser(Lexer lexer)
         {
             this.lexer = lexer;
@@ -35,7 +37,10 @@ namespace NullPInterpreter.Interpreter
         private void ConsumeCurrentToken(TokenType expectedTokenType)
         {
             if (currentToken.Type == expectedTokenType)
+            {
+                previousToken = currentToken;
                 currentToken = lexer.GetNextToken();
+            }
             else
                 // Throw an exception as the input didn't match the output
                 throw new SyntaxError(lexer.Line, lexer.LinePosition, $"Read token '{currentToken.Value}' did not match expected token '{TokenTypeExtension.TokenTypeToReadableString(expectedTokenType)}'.");
@@ -163,6 +168,11 @@ namespace NullPInterpreter.Interpreter
                 ASTNode result = NamespacePropertyCall();
                 return result;
             }
+            else if (token.Type == TokenType.LeftSquareBracket)
+            {
+                ASTNode result = List();
+                return result;
+            }
 
             throw new SyntaxError(lexer.Line, lexer.LinePosition, "Expression does not validate to known possible operations.");
         }
@@ -179,6 +189,24 @@ namespace NullPInterpreter.Interpreter
             return new TrueLiteral();
         }
 
+        private ASTNode List()
+        {
+            AST.List list = new AST.List();
+            ConsumeCurrentToken(TokenType.LeftSquareBracket);
+
+            while (true)
+            {
+                list.Items.Add(Expression());
+
+                if (currentToken.Type != TokenType.Comma)
+                    break;
+                ConsumeCurrentToken(TokenType.Comma);
+            }
+
+            ConsumeCurrentToken(TokenType.RightSquareBracket);
+            return list;
+        }
+
         private ASTNode NullLiteral()
         {
             ConsumeCurrentToken(TokenType.KeywordNull);
@@ -189,7 +217,38 @@ namespace NullPInterpreter.Interpreter
         {
             ASTNode node = new Variable(currentToken, currentToken.Value.ToString());
             ConsumeCurrentToken(TokenType.Word);
+
+            if (currentToken.Type == TokenType.LeftSquareBracket)
+            {
+                Indexer i = (Indexer)Indexer();
+                i.Variable = (Variable)node;
+                node = i;
+            }
+
             return node;
+        }
+
+        private ASTNode Indexer()
+        {
+            Indexer indexer = new Indexer();
+            ConsumeCurrentToken(TokenType.LeftSquareBracket);
+
+            indexer.Start = Convert.ToInt32(currentToken.Value);
+            ConsumeCurrentToken(TokenType.IntegerLiteral);
+
+            if (currentToken.Type == TokenType.Minus) // Ranged indexer
+            {
+                ConsumeCurrentToken(TokenType.Minus);
+                indexer.End = Convert.ToInt32(currentToken.Value);
+                ConsumeCurrentToken(TokenType.IntegerLiteral);
+            }
+            else
+            {
+                indexer.End = indexer.Start;
+            }
+
+            ConsumeCurrentToken(TokenType.RightSquareBracket);
+            return indexer;
         }
 
         private ASTNode Argument()

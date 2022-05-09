@@ -324,5 +324,53 @@ namespace NullPInterpreter.Interpreter
         {
             return null;
         }
+
+        protected override object VisitList(List n)
+        {
+            List<object> list = new List<object>();
+            foreach (var item in n.Items)
+            {
+                list.Add(Visit(item));
+            }
+
+            return list;
+        }
+
+        protected override object VisitIndexer(Indexer n)
+        {
+            object evaluatedObj = Visit(n.Variable);
+
+            if (evaluatedObj is string s)
+            {
+                if (n.Start < 0 || n.Start > s.Length-1 || n.End < 0 || n.End > s.Length-1)
+                    throw new IndexOutOfRangeException($"Index [{n.Start}-{n.End}] is not in bounds [0-{s.Length-1}]");
+
+                if (n.Start == n.End)
+                    return s[n.Start];
+                else
+                {
+                    return s.Substring(n.Start, n.End - n.Start);
+                }
+            }
+            else if (evaluatedObj is List<object> l)
+            {
+                if (n.Start < 0 || n.Start > l.Count-1 || n.End < 0 || n.End > l.Count-1)
+                    throw new IndexOutOfRangeException($"Index [{n.Start}-{n.End}] is not in bounds [0-{l.Count-1}]");
+
+                if (n.Start == n.End)
+                    return l[n.Start];
+                else
+                {
+                    List<object> tmpList = new List<object>();
+                    for (int i = n.Start; i <= n.End; i++)
+                    {
+                        tmpList.Add(l[i]);
+                    }
+                    return tmpList;
+                }
+            }
+
+            throw new Exception($"'{n.Variable.Name}' is not indexable.");
+        }
     }
 }

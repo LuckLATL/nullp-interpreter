@@ -226,6 +226,12 @@ namespace NullPInterpreter.Interpreter
                     case '}':
                         Advance();
                         return new Token(TokenType.BlockClose, '}');
+                    case '[':
+                        Advance();
+                        return new Token(TokenType.LeftSquareBracket, '[');
+                    case ']':
+                        Advance();
+                        return new Token(TokenType.RightSquareBracket, ']');
                     case '=':
                         Advance();
                         if (currentCharacter == '=')

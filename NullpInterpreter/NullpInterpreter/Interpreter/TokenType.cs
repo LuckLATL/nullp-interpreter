@@ -39,6 +39,8 @@ namespace NullPInterpreter.Interpreter
         KeywordFalse,
         KeywordNull,
         KeywordNew,
+        LeftSquareBracket,
+        RightSquareBracket,
         FunctionCall                        // Calling a function
     }
 
@@ -108,6 +110,10 @@ namespace NullPInterpreter.Interpreter
                     return "class";
                 case TokenType.KeywordNew:
                     return "new";
+                case TokenType.LeftSquareBracket:
+                    return "[";
+                case TokenType.RightSquareBracket:
+                    return "]";
                 case TokenType.FunctionCall:
                     return "function call";
             }

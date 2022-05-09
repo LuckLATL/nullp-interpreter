@@ -179,5 +179,20 @@ namespace NullPInterpreter.Interpreter
 
             return null;
         }
+
+        protected override object VisitList(List n)
+        {
+            foreach (ASTNode node in n.Items)
+            {
+                Visit(node);
+            }
+            return null;
+        }
+
+        protected override object VisitIndexer(Indexer n)
+        {
+            Visit(n.Variable);
+            return null;
+        }
     }
 }
