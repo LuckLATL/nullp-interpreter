@@ -383,11 +383,12 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitClassInstanceCreation(ClassInstanceCreation n)
         {
             ActivationRecord ar = new ActivationRecord(n.ClassSymbol.Name, ActivationRecordType.Class, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
-            CallStack.ExtendedPush(ar);
-            n.ClassSymbol.ClassActivationRecord = ar;
-            Visit(n.ClassSymbol.Declaration.Block);
 
-            FunctionSymbol constructor = n.ClassSymbol.ClassSymbols.LookUpSymbol(n.ClassSymbol.Name) as FunctionSymbol;
+            ClassSymbol newInstance = new ClassSymbol() { Name = n.ClassSymbol.Name, Type = SymbolType.Class, ClassActivationRecord = ar, ClassSymbols = n.ClassSymbol.ClassSymbols, Declaration = n.ClassSymbol.Declaration };
+            CallStack.ExtendedPush(ar);
+            Visit(newInstance.Declaration.Block);
+
+            FunctionSymbol constructor = newInstance.ClassSymbols.LookUpSymbol(newInstance.Name) as FunctionSymbol;
             if (constructor != null)
             {
                 ActivationRecord constructorAr = new ActivationRecord(constructor.Name, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
@@ -414,7 +415,7 @@ namespace NullPInterpreter.Interpreter
 
             CallStack.Pop();
 
-            return n.ClassSymbol;
+            return newInstance;
         }
 
         protected override object VisitClassDeclaration(ClassDeclaration n)
