@@ -38,7 +38,9 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitAssignmentOperator(AssignmentOperator n)
         {
-            CallStack.Peek().SetMember(((Variable)n.LeftNode).Name, Visit(n.RightNode));
+            object rightNode = Visit(n.RightNode);
+
+            CallStack.Peek().SetMember(((Variable)n.LeftNode).Name, rightNode);
             return null;
         }
 
@@ -365,9 +367,11 @@ namespace NullPInterpreter.Interpreter
                 {
                     ar.SetMember(constructor.Declaration.Arguments[i].Name, Visit(fcall.Arguments[i]));
                 }
-                CallStack.ExtendedPush(ar);
+                CallStack.ExtendedPush(constructorAr);
 
                 Visit(constructor.Declaration.Block);
+
+                CallStack.Pop();
             }
 
             CallStack.Pop();

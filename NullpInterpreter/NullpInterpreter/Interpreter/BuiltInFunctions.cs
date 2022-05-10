@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace NullPInterpreter.Interpreter
                 case "WriteLine":
 
                     string outputString = GetStringForObject(arguments[0]);
-                    Console.WriteLine($" [{DateTime.Now}] " + outputString);
+                    Console.WriteLine($" [{DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}] " + outputString);
                     break;
                 case "ReadLine":
                     Console.Write(" > ");
