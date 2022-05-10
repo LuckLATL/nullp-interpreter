@@ -1,6 +1,7 @@
 ﻿using NullPInterpreter.Interpreter.AST;
 using NullPInterpreter.Interpreter.CallStackManagement;
 using NullPInterpreter.Interpreter.Symbols;
+using NullPInterpreter.Special;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -165,10 +166,12 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitVariableDeclaration(VariableDeclaration n)
         {
+            object initialValue = new NullObject();
             if (n.InitialDefinition != null)
             {
-                CallStack.Peek().SetMember(n.Variable.Name, Visit(n.InitialDefinition));
+                initialValue = Visit(n.InitialDefinition);
             }
+            CallStack.Peek().SetMember(n.Variable.Name, initialValue);
             return null;
         }
 
@@ -374,7 +377,7 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitNullLiteral(NullLiteral n)
         {
-            return null;
+            return new NullObject();
         }
 
         protected override object VisitClassInstanceCreation(ClassInstanceCreation n)
@@ -400,7 +403,7 @@ namespace NullPInterpreter.Interpreter
 
                 for (int i = 0; i < constructor.Declaration.Arguments.Count; i++)
                 {
-                    ar.SetMember(constructor.Declaration.Arguments[i].Name, Visit(fcall.Arguments[i]));
+                    constructorAr.SetMember(constructor.Declaration.Arguments[i].Name, Visit(fcall.Arguments[i]));
                 }
                 CallStack.ExtendedPush(constructorAr);
 

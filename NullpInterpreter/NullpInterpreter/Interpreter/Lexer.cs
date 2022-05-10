@@ -108,7 +108,7 @@ namespace NullPInterpreter.Interpreter
                 Advance();
             }
 
-            if (currentCharacter == '.')
+            if (currentCharacter == '.' && char.IsDigit(Peek()))
             {
                 result += currentCharacter;
                 Advance();

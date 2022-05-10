@@ -239,9 +239,10 @@ namespace NullPInterpreter.Interpreter
             indexer.Start = Convert.ToInt32(currentToken.Value);
             ConsumeCurrentToken(TokenType.IntegerLiteral);
 
-            if (currentToken.Type == TokenType.Minus) // Ranged indexer
+            if (currentToken.Type == TokenType.Dot) // Ranged indexer
             {
-                ConsumeCurrentToken(TokenType.Minus);
+                ConsumeCurrentToken(TokenType.Dot);
+                ConsumeCurrentToken(TokenType.Dot);
                 indexer.End = Convert.ToInt32(currentToken.Value);
                 ConsumeCurrentToken(TokenType.IntegerLiteral);
             }
