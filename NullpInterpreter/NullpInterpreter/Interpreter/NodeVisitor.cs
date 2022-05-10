@@ -54,6 +54,8 @@ namespace NullPInterpreter.Interpreter
                     return VisitVariableDeclaration(n);
                 case FunctionForwardDeclaration n:
                     return VisitFunctionForwardDeclaration(n);
+                case ClassForwardDeclaration n:
+                    return VisitClassForwardDeclaration(n);
                 case NullLiteral n:
                     return VisitNullLiteral(n);
                 case FalseLiteral n:
@@ -73,6 +75,7 @@ namespace NullPInterpreter.Interpreter
             throw new Exception("Unsupported type");
         }
 
+        protected abstract object VisitClassForwardDeclaration(ClassForwardDeclaration n);
         protected abstract object VisitWhileStatement(WhileStatement n);
         protected abstract object VisitIndexer(Indexer n);
         protected abstract object VisitList(List n);

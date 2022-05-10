@@ -349,7 +349,26 @@ namespace NullPInterpreter.Interpreter
 
             FunctionSymbol constructor = n.ClassSymbol.ClassSymbols.LookUpSymbol(n.ClassSymbol.Name) as FunctionSymbol;
             if (constructor != null)
+            {
+                ActivationRecord constructorAr = new ActivationRecord(constructor.Name, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
+
+                ASTNode subNodes = n.ClassToCreate;
+
+                while (subNodes is NamespacePropertyCall npc)
+                {
+                    subNodes = npc.CalledNode;
+                }
+
+                FunctionCall fcall = (FunctionCall)subNodes;
+
+                for (int i = 0; i < constructor.Declaration.Arguments.Count; i++)
+                {
+                    ar.SetMember(constructor.Declaration.Arguments[i].Name, Visit(fcall.Arguments[i]));
+                }
+                CallStack.ExtendedPush(ar);
+
                 Visit(constructor.Declaration.Block);
+            }
 
             CallStack.Pop();
 
@@ -418,6 +437,11 @@ namespace NullPInterpreter.Interpreter
                     break;
             }
 
+            return null;
+        }
+
+        protected override object VisitClassForwardDeclaration(ClassForwardDeclaration n)
+        {
             return null;
         }
     }

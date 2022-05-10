@@ -36,6 +36,11 @@ namespace NullPInterpreter.Interpreter.Symbols
             {
                 if (symbol.Type == SymbolType.Function && symbols[symbol.Name].Type == SymbolType.Function && (symbols[symbol.Name] as FunctionSymbol).Declaration == null)
                     ((FunctionSymbol)symbols[symbol.Name]).Declaration = ((FunctionSymbol)symbol).Declaration;
+                else if (symbol.Type == SymbolType.Class && symbols[symbol.Name].Type == SymbolType.Class && (symbols[symbol.Name] as ClassSymbol).Declaration == null)
+                {
+                    ((ClassSymbol)symbols[symbol.Name]).Declaration = ((ClassSymbol)symbol).Declaration;
+                    ((ClassSymbol)symbols[symbol.Name]).ClassSymbols = ((ClassSymbol)symbol).ClassSymbols;
+                }
                 else
                     throw new DuplicateIdentifierError($"Symbol with the name '{symbol.Name}' has already been declared.");
             }

@@ -235,8 +235,9 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitClassDeclaration(ClassDeclaration n)
         {
             ClassSymbol csymb = new ClassSymbol() { Name = n.Name, Type = SymbolType.Class, Declaration = n };
+            csymb.ClassSymbols = new ScopedSymbolTable(n.Name, CurrentScope.ScopeLevel + 1, CurrentScope);
             CurrentScope.AddSymbol(csymb);
-            CurrentScope = csymb.ClassSymbols = new ScopedSymbolTable(n.Name, CurrentScope.ScopeLevel + 1, CurrentScope);
+            CurrentScope = csymb.ClassSymbols;
             
             Visit(n.Block);
             CurrentScope = CurrentScope.EnclosingScope;
@@ -263,6 +264,13 @@ namespace NullPInterpreter.Interpreter
         {
             Visit(n.BooleanExpression);
             Visit(n.Block);
+            return null;
+        }
+
+        protected override object VisitClassForwardDeclaration(ClassForwardDeclaration n)
+        {
+            ClassSymbol cSym = new ClassSymbol() { Name = n.Name, Type = SymbolType.Class, Declaration = null };
+            CurrentScope.AddSymbol(cSym);
             return null;
         }
     }

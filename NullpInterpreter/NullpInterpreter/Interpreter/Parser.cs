@@ -351,7 +351,18 @@ namespace NullPInterpreter.Interpreter
             ConsumeCurrentToken(TokenType.KeywordClass);
             string className = currentToken.Value.ToString();
             ConsumeCurrentToken(TokenType.Word);
-            ClassDeclaration classNode = new ClassDeclaration((Block)Block(), className);
+
+            ASTNode classNode = null;
+            if (currentToken.Type == TokenType.Semicolon)
+            {
+                classNode = new ClassForwardDeclaration(className);
+            }
+            else
+            {
+                classNode = new ClassDeclaration((Block)Block(), className);
+            }
+
+            
             return classNode;
         }
 
