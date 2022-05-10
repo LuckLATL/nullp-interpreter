@@ -24,9 +24,9 @@ namespace NullPInterpreter.Interpreter
             switch (functionName)
             {
                 case "WriteLine":
-                    if (arguments[0] == null)
-                        arguments[0] = "NULL";
-                    Console.WriteLine($" [{DateTime.Now}] " + arguments[0].ToString());
+
+                    string outputString = GetStringForObject(arguments[0]);
+                    Console.WriteLine($" [{DateTime.Now}] " + outputString);
                     break;
                 case "ReadLine":
                     Console.Write(" > ");
@@ -35,6 +35,32 @@ namespace NullPInterpreter.Interpreter
                     break;
             }
             return null;
+        }
+
+        public static string GetStringForObject(object o)
+        {
+            string output = "";
+
+            switch (o)
+            {
+                case List<object> l:
+                    output += "[ ";
+                    foreach (var item in l)
+                    {
+                        output += GetStringForObject(item) + ", ";
+                    }
+                    output = output.Substring(0, output.Length - 2);
+                    output += " ]";
+                    break;
+                case null:
+                    output = "<NULL>";
+                    break;
+                default:
+                    output = o.ToString();
+                    break;
+            }
+
+            return output;
         }
     }
 }

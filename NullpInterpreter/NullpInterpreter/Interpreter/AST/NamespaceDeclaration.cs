@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NullPInterpreter.Interpreter.Symbols;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace NullPInterpreter.Interpreter.AST
     {
         public Block Block { get; set; }
         public string Name { get; set; }
+        public NamespaceSymbol SourceSymbol { get; set; }
 
         public NamespaceDeclaration(Block block, string name)
         {

@@ -1,4 +1,5 @@
 ﻿using NullPInterpreter.Interpreter.AST;
+using NullPInterpreter.Interpreter.CallStackManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace NullPInterpreter.Interpreter.Symbols
 {
     public class NamespaceSymbol : Symbol
     {
-        public NamespaceDeclaration Declaration { get; set; }
+        public ScopedSymbolTable NamespaceSymbols { get; set; }
+        public ActivationRecord NamespaceActivationRecord { get; set; }
     }
 }

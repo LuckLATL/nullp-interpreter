@@ -362,9 +362,9 @@ namespace NullPInterpreter.Interpreter
             ClassInstanceCreation node = new ClassInstanceCreation();
 
             if (currentToken.Type == TokenType.NamespacePropertyCall)
-                throw new NotImplementedException();
+                node.ClassToCreate = NamespacePropertyCall();
             else if (currentToken.Type == TokenType.FunctionCall)
-                node.ClassToCreate = (FunctionCall)FunctionCall();
+                node.ClassToCreate = FunctionCall();
 
             return node;
         }

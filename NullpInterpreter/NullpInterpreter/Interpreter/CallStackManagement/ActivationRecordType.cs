@@ -9,6 +9,7 @@ namespace NullPInterpreter.Interpreter.CallStackManagement
     public enum ActivationRecordType
     {
         Program,
+        Namespace,
         Class,
         Function
     }

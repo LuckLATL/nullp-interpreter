@@ -41,8 +41,8 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitVariableDeclaration(VariableDeclaration n)
         {
-            Visit(n.InitialDefinition);
-            CurrentScope.AddSymbol(new Symbol() { Name = n.Variable.Name, Type = SymbolType.Variable });
+            object def = Visit(n.InitialDefinition);
+            CurrentScope.AddSymbol(new VariableSymbol() { Name = n.Variable.Name, Type = SymbolType.Variable });
             return null;
         }
 
@@ -83,8 +83,11 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitNamespaceDeclaration(NamespaceDeclaration n)
         {
-            CurrentScope.AddSymbol(new Symbol() { Name = n.Name, Type = SymbolType.Namespace });
+            NamespaceSymbol namespaceSymbol = new NamespaceSymbol() { Name = n.Name, Type = SymbolType.Namespace };
+            CurrentScope.AddSymbol(namespaceSymbol);
             CurrentScope = new ScopedSymbolTable(n.Name, CurrentScope.ScopeLevel + 1, CurrentScope);
+            namespaceSymbol.NamespaceSymbols = CurrentScope;
+            n.SourceSymbol = namespaceSymbol;
 
             Visit(n.Block);
 
@@ -95,9 +98,56 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitNamespacePropertyCall(NamespacePropertyCall n)
         {
-            CurrentScope.LookUpSymbol(n.CallerName);
-            //Visit(n.CalledNode);
+            ASTNode temp = n.CalledNode;
+            ScopedSymbolTable savedScope = CurrentScope;
+
+            object callerSymbol = CurrentScope.LookUpSymbol(n.CallerName);
+
+            
+
             return null;
+
+            //while (temp is NamespacePropertyCall nspc)
+            //{
+            //    object calledObj = CurrentScope.LookUpSymbol(nspc.CallerName);
+
+            //    if (calledObj is NamespaceSymbol nsym)
+            //    {
+            //        CurrentScope = nsym.NamespaceSymbols;
+            //    }
+            //    else if (calledObj is ClassSymbol classSym)
+            //    {
+            //        CurrentScope = classSym.ClassSymbols;
+            //    }
+
+            //    temp = nspc.CalledNode;
+            //}
+
+            //if (temp is FunctionCall fcall)
+            //{
+            //    //fcall.FunctionSymbol = (FunctionSymbol)CurrentScope.LookUpSymbol(fcall.FunctionName);
+            //}
+            //else if (temp is Variable v)
+            //{
+            //    // ????
+            //}
+
+            //CurrentScope = savedScope;
+
+
+
+            //Symbol source = CurrentScope.LookUpSymbol(n.CallerName);
+            //n.SourceSymbol = source;
+
+            //if (source is NamespaceSymbol ns)
+            //{
+            //    ScopedSymbolTable savedScope = CurrentScope;
+            //    CurrentScope = ns.NamespaceSymbols;
+            //    Visit(n.CalledNode);
+            //    CurrentScope = savedScope;
+            //}
+
+            //return null;
         }
 
         protected override object VisitNoOperator(NoOperator n)
@@ -163,7 +213,21 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitClassInstanceCreation(ClassInstanceCreation n)
         {
-            object obj = CurrentScope.LookUpSymbol(n.ClassToCreate.FunctionName);
+            object obj = null;
+
+            ASTNode temp = n.ClassToCreate;
+            ScopedSymbolTable oldScope = CurrentScope;
+
+            while (temp is NamespacePropertyCall nspc)
+            {
+                CurrentScope = ((NamespaceSymbol)CurrentScope.LookUpSymbol(nspc.CallerName)).NamespaceSymbols;
+                temp = nspc.CalledNode;
+            }
+
+            obj = CurrentScope.LookUpSymbol(((FunctionCall)temp).FunctionName);
+
+            CurrentScope = oldScope;
+
             n.ClassSymbol = (ClassSymbol)obj;
             return null;
         }

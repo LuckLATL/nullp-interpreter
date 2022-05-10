@@ -194,64 +194,96 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitNamespaceDeclaration(NamespaceDeclaration n)
         {
+            ActivationRecord ar = new ActivationRecord(n.Name, ActivationRecordType.Namespace, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
+            n.SourceSymbol.NamespaceActivationRecord = ar;
+            CallStack.Peek().SetMember(n.Name, n.SourceSymbol);
+            CallStack.ExtendedPush(ar);
             Visit(n.Block);
+            CallStack.Pop();
             return null;
         }
 
         protected override object VisitNamespacePropertyCall(NamespacePropertyCall n)
         {
-            if (n.CalledNode is NamespacePropertyCall)
-            {
-                object calledObj = CallStack.Peek().GetMember(n.CallerName);
+            ASTNode temp = n.CalledNode;
+            object returnValue = null;
+            int scopeCounter = 0;
 
-                if (calledObj is ClassSymbol calledClass)
-                {
-                    CallStack.ExtendedPush(calledClass.ClassActivationRecord);
-                    object returnValue = Visit(n.CalledNode);
-                    CallStack.Pop();
-                    return returnValue;
-                }
+            object callerSymbol = n.SourceSymbol;
+            if (callerSymbol == null)
+                callerSymbol = CallStack.Peek().GetMember(n.CallerName);
+
+            ScopedSymbolTable latestSymbol = null;
+
+            switch (callerSymbol)
+            {
+                case NamespaceSymbol ns:
+                    CallStack.ExtendedPush(ns.NamespaceActivationRecord);
+                    latestSymbol = ns.NamespaceSymbols;
+                    scopeCounter++;
+                    break;
+                case ClassSymbol cs:
+                    CallStack.ExtendedPush(cs.ClassActivationRecord);
+                    latestSymbol = cs.ClassSymbols;
+                    scopeCounter++;
+                    break;
             }
-            else if (n.CalledNode is FunctionCall)
+
+            while (temp is NamespacePropertyCall nspc)
             {
-                object calledObj = CallStack.Peek().GetMember(n.CallerName);
+                object calledObj = CallStack.Peek().GetMember(nspc.CallerName);
 
-                if (calledObj is ClassSymbol)
+                if (calledObj is NamespaceSymbol nsym)
                 {
-                    ClassSymbol calledClass = (ClassSymbol)calledObj;
-
-                    FunctionSymbol func = ((FunctionSymbol)(calledClass.ClassSymbols.LookUpSymbol(((FunctionCall)n.CalledNode).FunctionName)));
-
-                    ActivationRecord ar = new ActivationRecord(func.Name, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
-                    CallStack.ExtendedPush(calledClass.ClassActivationRecord);
-                    CallStack.ExtendedPush(ar);
-
-                    for (int i = 0; i < func.Declaration.Arguments.Count; i++)
-                    {
-                        ar.SetMember(func.Declaration.Arguments[i].Name, Visit((n.CalledNode as FunctionCall).Arguments[i]));
-                    }
-
-                    Visit(func.Declaration.Block);
-
-                    CallStack.Pop();
-                    CallStack.Pop();
-
-                    return ar.ReturnValue;
+                    CallStack.ExtendedPush(nsym.NamespaceActivationRecord);
+                    latestSymbol = nsym.NamespaceSymbols;
+                    scopeCounter++;
                 }
-
-            }
-            else if (n.CalledNode is Variable)
-            {
-                object calledObj = CallStack.Peek().GetMember(n.CallerName);
-
-                if (calledObj is ClassSymbol)
+                else if (calledObj is ClassSymbol classSym)
                 {
-                    ClassSymbol calledClass = (ClassSymbol)calledObj;
-
-                    return calledClass.ClassActivationRecord.GetMember(((Variable)n.CalledNode).Name);
+                    CallStack.ExtendedPush(classSym.ClassActivationRecord);
+                    latestSymbol = classSym.ClassSymbols;
+                    scopeCounter++;
                 }
 
+                temp = nspc.CalledNode;
             }
+
+            if (temp is FunctionCall fcall)
+            {
+                ActivationRecord ar = new ActivationRecord(fcall.FunctionName, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
+                FunctionSymbol funcSym = fcall.FunctionSymbol;
+
+                if (funcSym == null)
+                    funcSym = (FunctionSymbol)latestSymbol.LookUpSymbol(fcall.FunctionName);
+
+                for (int i = 0; i < funcSym.Declaration.Arguments.Count; i++)
+                {
+                    ar.SetMember(funcSym.Declaration.Arguments[i].Name, Visit(fcall.Arguments[i]));
+                }
+                CallStack.ExtendedPush(ar);
+
+                Visit(funcSym.Declaration.Block);
+                returnValue = CallStack.Peek().ReturnValue;
+                CallStack.Pop();
+            }
+            else if (temp is ClassInstanceCreation cic)
+            {
+                returnValue = Visit(cic);
+            }
+            else if (temp is Variable v)
+            {
+                returnValue = CallStack.Peek().GetMember(v.Name);
+            }
+
+
+            for (int i = 0; i < scopeCounter; i++)
+            {
+                CallStack.Pop();
+            }
+
+            return returnValue;
+
             throw new NotImplementedException("This feature has not been implemented yet");
         }
 

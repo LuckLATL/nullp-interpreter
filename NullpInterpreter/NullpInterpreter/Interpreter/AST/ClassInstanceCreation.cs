@@ -11,7 +11,7 @@ namespace NullPInterpreter.Interpreter.AST
     [DebuggerDisplay("[Class Instance Creation '{ClassSymbol.Name}']")]
     public class ClassInstanceCreation : ASTNode
     {
-        public FunctionCall ClassToCreate { get; set; }
+        public ASTNode ClassToCreate { get; set; }
         public ClassSymbol ClassSymbol { get; set; }
     }
 }
