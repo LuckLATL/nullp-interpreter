@@ -40,7 +40,42 @@ namespace NullPInterpreter.Interpreter
         {
             object rightNode = Visit(n.RightNode);
 
-            CallStack.Peek().SetMember(((Variable)n.LeftNode).Name, rightNode);
+            if (n.LeftNode is Variable v)
+                CallStack.Peek().SetMember(v.Name, rightNode);
+            else if (n.LeftNode is Indexer i)
+            {
+                object variableValue = CallStack.Peek().GetMember(i.Variable.Name);
+                if (variableValue is List<object> l)
+                {
+                    if (i.Start < 0 || i.End < 0)
+                        throw new IndexOutOfRangeException($"Index '{i.Start}-{i.End}' was out of range for list for index '{l.Count}'");
+
+                    if (i.Start >= l.Count || i.End >= l.Count)
+                    {
+                        int max = i.Start < i.End ? i.End : i.Start;
+
+                        while (l.Count <= max)
+                        {
+                            l.Add(null);
+                        }
+                    }
+
+
+                    for (int ii = i.Start; ii <= i.End; ii++)
+                    {
+                        l[ii] = rightNode;
+                    }
+                }
+                else if (variableValue is string s)
+                {
+                    if (i.Start < 0 || i.Start >= s.Length || i.End < 0 || i.End >= s.Length)
+                        throw new IndexOutOfRangeException($"Index '{i.Start}-{i.End}' was out of range for string for index '{s.Length}'");
+
+                    string first = s.Substring(0, i.Start);
+                    string second = s.Substring(i.End + 1, s.Length-i.End-1);
+                    CallStack.Peek().SetMember(i.Variable.Name, first + rightNode.ToString() + second);
+                }
+            }
             return null;
         }
 

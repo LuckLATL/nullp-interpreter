@@ -194,13 +194,16 @@ namespace NullPInterpreter.Interpreter
             AST.List list = new AST.List();
             ConsumeCurrentToken(TokenType.LeftSquareBracket);
 
-            while (true)
+            if (currentToken.Type != TokenType.RightSquareBracket)
             {
-                list.Items.Add(Expression());
+                while (true)
+                {
+                    list.Items.Add(Expression());
 
-                if (currentToken.Type != TokenType.Comma)
-                    break;
-                ConsumeCurrentToken(TokenType.Comma);
+                    if (currentToken.Type != TokenType.Comma)
+                        break;
+                    ConsumeCurrentToken(TokenType.Comma);
+                }
             }
 
             ConsumeCurrentToken(TokenType.RightSquareBracket);
@@ -475,7 +478,7 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode AssigmentStatement()
         {
-            Variable left = (Variable)Variable();
+            ASTNode left = Variable();
             ASTNode node = null;
             ASTNode right = null;
             Token token = new Token(TokenType.Assign, '=');
