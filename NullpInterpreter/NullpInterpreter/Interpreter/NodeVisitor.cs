@@ -68,6 +68,8 @@ namespace NullPInterpreter.Interpreter
                     return VisitTrueLiteral(n);
                 case List n:
                     return VisitList(n);
+                case BooleanExpressionCombination n:
+                    return VisitBooleanExpressionCombination(n);
                 case Indexer n:
                     return VisitIndexer(n);
             }
@@ -75,6 +77,7 @@ namespace NullPInterpreter.Interpreter
             throw new Exception("Unsupported type");
         }
 
+        protected abstract object VisitBooleanExpressionCombination(BooleanExpressionCombination n);
         protected abstract object VisitClassForwardDeclaration(ClassForwardDeclaration n);
         protected abstract object VisitWhileStatement(WhileStatement n);
         protected abstract object VisitIndexer(Indexer n);

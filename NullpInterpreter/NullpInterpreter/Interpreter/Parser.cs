@@ -173,6 +173,10 @@ namespace NullPInterpreter.Interpreter
                 ASTNode result = List();
                 return result;
             }
+            else if (token.Type == TokenType.Pipe || token.Type == TokenType.Ampersand)
+            {
+                return null;
+            }
 
             throw new SyntaxError(lexer.Line, lexer.LinePosition, "Expression does not validate to known possible operations.");
         }
@@ -447,11 +451,33 @@ namespace NullPInterpreter.Interpreter
                 ConsumeCurrentToken(TokenType.Equals);
             else if (currentToken.Type == TokenType.NotEquals)
                 ConsumeCurrentToken(TokenType.NotEquals);
+            else if (currentToken.Type == TokenType.Smaller)
+                ConsumeCurrentToken(TokenType.Smaller);
+            else if (currentToken.Type == TokenType.Greater)
+                ConsumeCurrentToken(TokenType.Greater);
+            else if (currentToken.Type == TokenType.SmallerEquals)
+                ConsumeCurrentToken(TokenType.SmallerEquals);
+            else if (currentToken.Type == TokenType.GreaterEquals)
+                ConsumeCurrentToken(TokenType.GreaterEquals);
             else if (currentToken.Type == TokenType.RightParenthesis)
                 isStandaloneExpressnion = true;
 
             if (!isStandaloneExpressnion)
                 node.Right = Expression();
+
+            if (currentToken.Type == TokenType.Pipe || currentToken.Type == TokenType.Ampersand)
+            {
+                BooleanExpressionCombination combination = new BooleanExpressionCombination() { Left = node };
+
+                TokenType savedType = currentToken.Type;
+                ConsumeCurrentToken(savedType);
+                ConsumeCurrentToken(savedType);
+
+                combination.Right = BooleanExpression();
+                combination.Operator = savedType;
+                return combination;
+            }
+
             return node;
         }
 

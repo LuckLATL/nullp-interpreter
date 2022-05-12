@@ -232,6 +232,23 @@ namespace NullPInterpreter.Interpreter
                     case ']':
                         Advance();
                         return new Token(TokenType.RightSquareBracket, ']');
+                    case '<':
+
+                        Advance();
+                        if (currentCharacter == '=')
+                        {
+                            Advance();
+                            return new Token(TokenType.SmallerEquals, "<=");
+                        }
+                        return new Token(TokenType.Smaller, '<');
+                    case '>':
+                        Advance();
+                        if (currentCharacter == '=')
+                        {
+                            Advance();
+                            return new Token(TokenType.GreaterEquals, ">=");
+                        }
+                        return new Token(TokenType.Greater, '>');
                     case '=':
                         Advance();
                         if (currentCharacter == '=')
@@ -251,6 +268,12 @@ namespace NullPInterpreter.Interpreter
                     case ';':
                         Advance();
                         return new Token(TokenType.Semicolon, ';');
+                    case '|':
+                        Advance();
+                        return new Token(TokenType.Pipe, '|');
+                    case '&':
+                        Advance();
+                        return new Token(TokenType.Ampersand, '&');
                     case '.':
                         Advance();
                         return new Token(TokenType.Dot, '.');

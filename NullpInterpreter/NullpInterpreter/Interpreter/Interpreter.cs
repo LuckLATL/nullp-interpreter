@@ -1,7 +1,7 @@
 ﻿using NullPInterpreter.Interpreter.AST;
 using NullPInterpreter.Interpreter.CallStackManagement;
 using NullPInterpreter.Interpreter.Symbols;
-using NullPInterpreter.Special;
+using NullPInterpreter.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -148,19 +148,46 @@ namespace NullPInterpreter.Interpreter
             if (leftResult is bool && rightResult == null)
                 return leftResult;
 
-            if ((leftResult == null && rightResult != null) || (leftResult != null && rightResult == null))
-                return false;
-
-            if (leftResult == null && rightResult == null)
-                return true;
-
             switch (n.Operator)
             {
                 case TokenType.Equals:
+
+                    if ((leftResult is NullObject && rightResult is not NullObject) || (leftResult is not NullObject && rightResult is NullObject))
+                        return false;
+
+                    if (leftResult is NullObject && rightResult is NullObject)
+                        return true;
+
                     return leftResult.Equals(rightResult);
                 case TokenType.NotEquals:
+
+                    if ((leftResult is NullObject && rightResult is not NullObject) || (leftResult is not NullObject && rightResult is NullObject))
+                        return true;
+
+                    if (leftResult is NullObject && rightResult is NullObject)
+                        return false;
+
                     return !leftResult.Equals(rightResult);
             }
+
+            if (!(leftResult is double && rightResult is double))
+                throw new Exception("Both values must be a number value");
+
+            double leftDouble = Convert.ToDouble(leftResult);
+            double rightDouble = Convert.ToDouble(rightResult);
+
+            switch (n.Operator)
+            {
+                case TokenType.GreaterEquals:
+                    return leftDouble >= rightDouble;
+                case TokenType.SmallerEquals:
+                    return leftDouble <= rightDouble;
+                case TokenType.Greater:
+                    return leftDouble > rightDouble;
+                case TokenType.Smaller:
+                    return leftDouble < rightDouble;
+            }
+
             throw new Exception($"Invalid operator ('{TokenTypeExtension.TokenTypeToReadableString(n.Operator)}') for boolean expression found.");
         }
 
@@ -485,6 +512,21 @@ namespace NullPInterpreter.Interpreter
 
         protected override object VisitClassForwardDeclaration(ClassForwardDeclaration n)
         {
+            return null;
+        }
+
+        protected override object VisitBooleanExpressionCombination(BooleanExpressionCombination n)
+        {
+            bool left = (bool)Visit(n.Left);
+            bool right = (bool)Visit(n.Right);
+
+            switch (n.Operator)
+            {
+                case TokenType.Pipe:
+                    return  left || right;
+                case TokenType.Ampersand:
+                    return left && right;
+            }
             return null;
         }
     }

@@ -32,6 +32,12 @@ namespace NullPInterpreter.Interpreter
         KeywordWhile,
         Equals,
         NotEquals,
+        SmallerEquals,
+        GreaterEquals,
+        Smaller,
+        Greater,
+        Pipe,
+        Ampersand,
         KeywordFunction,
         NamespacePropertyCall,
         Comma,
@@ -115,6 +121,18 @@ namespace NullPInterpreter.Interpreter
                     return "[";
                 case TokenType.RightSquareBracket:
                     return "]";
+                case TokenType.SmallerEquals:
+                    return "<=";
+                case TokenType.GreaterEquals:
+                    return ">=";
+                case TokenType.Smaller:
+                    return "<";
+                case TokenType.Greater:
+                    return ">";
+                case TokenType.Pipe:
+                    return "|";
+                case TokenType.Ampersand:
+                    return "|";
                 case TokenType.KeywordWhile:
                     return "while";
                 case TokenType.FunctionCall:

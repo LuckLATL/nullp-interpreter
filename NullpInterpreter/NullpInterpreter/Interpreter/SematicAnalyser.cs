@@ -273,5 +273,12 @@ namespace NullPInterpreter.Interpreter
             CurrentScope.AddSymbol(cSym);
             return null;
         }
+
+        protected override object VisitBooleanExpressionCombination(BooleanExpressionCombination n)
+        {
+            Visit(n.Left);
+            Visit(n.Right);
+            return null;
+        }
     }
 }
