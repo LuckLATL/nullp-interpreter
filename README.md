@@ -24,12 +24,12 @@ namespace Program
 	class FruitManager;
 	
 	// Main function for us to execute
-	function Main()							
+	function Main()
 	{
 		// Create new instance of fruit manager
 		var fruitManager = new FruitManager();
 		// Call functions of instance
-		Console.WriteLine("User has chosen: " + fruitManager.AskForFruit("apple"));					
+		Console.WriteLine("User has chosen: " + fruitManager.AskForFruit("apple"));	
 	}
 	
 	// Fruit Manager class
@@ -42,19 +42,18 @@ namespace Program
 			// Read input
 			var answer = Console.ReadLine();
 			
-			if (answer == favorite)						
+			if (answer == favorite)
 			{
 				Console.WriteLine("Good choice!");
 				return favorite;
 			}
-			else											
+			else
 			{
 				Console.WriteLine("Not my favorite but okay.");
 			}
 			
 			return answer;
 		}
-		
 	}
 }
 // Execute function
