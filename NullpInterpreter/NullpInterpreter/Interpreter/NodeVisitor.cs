@@ -72,11 +72,14 @@ namespace NullPInterpreter.Interpreter
                     return VisitBooleanExpressionCombination(n);
                 case Indexer n:
                     return VisitIndexer(n);
+                case AST.BuiltIn n:
+                    return VisitBuiltIn(n);
             }
 
             throw new Exception("Unsupported type");
         }
 
+        protected abstract object VisitBuiltIn(AST.BuiltIn n);
         protected abstract object VisitBooleanExpressionCombination(BooleanExpressionCombination n);
         protected abstract object VisitClassForwardDeclaration(ClassForwardDeclaration n);
         protected abstract object VisitWhileStatement(WhileStatement n);

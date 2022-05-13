@@ -8,7 +8,7 @@ namespace NullPInterpreter.Interpreter.Symbols
 {
     public class Symbol
     {
-        public string Name { get; set; }
-        public SymbolType Type { get; set; }
+        public virtual string Name { get; set; }
+        public virtual SymbolType Type { get; set; }
     }
 }

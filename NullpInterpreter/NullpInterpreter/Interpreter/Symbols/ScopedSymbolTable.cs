@@ -1,4 +1,5 @@
-﻿using NullPInterpreter.Interpreter.Exceptions;
+﻿using NullPInterpreter.Interpreter.BuiltIn;
+using NullPInterpreter.Interpreter.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,10 +25,47 @@ namespace NullPInterpreter.Interpreter.Symbols
             EnclosingScope = enclosingScope;
         }
 
+        
         public void InitializeBuiltIns()
         {
-            symbols.Add("WriteLine", new FunctionSymbol() { Name = "WriteLine", Type = SymbolType.Function });
-            symbols.Add("ReadLine", new FunctionSymbol() { Name = "ReadLine", Type = SymbolType.Function });
+            foreach (var item in BuiltInManager.BuiltIns)
+            {
+                AddBuiltIn(item, this);
+            }
+
+            //symbols.Add("WriteLine", new FunctionSymbol() { Name = "WriteLine", Type = SymbolType.Function });
+            //symbols.Add("ReadLine", new FunctionSymbol() { Name = "ReadLine", Type = SymbolType.Function });
+            
+            symbols.Add("DateTime", new NullPDateTime());
+
+        }
+
+        private void AddBuiltIn(BuiltInBase builtIn, ScopedSymbolTable parent)
+        {
+            switch (builtIn)
+            {
+                case BuiltInFunction builtInFunction:
+                    FunctionSymbol f = new FunctionSymbol() { Name = builtInFunction.Name, Type = SymbolType.Function };
+                    
+                    f.Declaration = new AST.FunctionDeclaration() { Block = new AST.Block(), FunctionName = f.Name };
+                    f.Declaration.Block.Children.Add(new AST.BuiltIn() { Function = builtInFunction.Function });
+                    parent.AddSymbol(f);
+                    break;
+                case BuiltInNamespace builtInNamespace:
+                    NamespaceSymbol s = new NamespaceSymbol() { Name = builtInNamespace.Name, Type = SymbolType.Namespace };
+                    s.NamespaceActivationRecord = new CallStackManagement.ActivationRecord(builtInNamespace.Name, CallStackManagement.ActivationRecordType.Namespace, parent.ScopeLevel + 1);
+                    s.NamespaceSymbols = new ScopedSymbolTable(builtInNamespace.Name, parent.ScopeLevel + 1, parent);
+                    parent.AddSymbol(s);
+
+                    foreach (var item in builtInNamespace.Children)
+                    {
+                        AddBuiltIn(item, s.NamespaceSymbols);
+                    }
+
+                    break;
+                case BuiltInClass builtInClass:
+                    break;
+            }
         }
 
         public void AddSymbol(Symbol symbol)
@@ -47,17 +85,20 @@ namespace NullPInterpreter.Interpreter.Symbols
             symbols[symbol.Name] = symbol;
         }
 
-        public Symbol LookUpSymbol(string symbolName)
+        public Symbol LookUpSymbol(string symbolName, bool returnNullOnMiss = false)
         {
             if (!symbols.ContainsKey(symbolName))
             {
                 if (EnclosingScope == null)
                 {
+                    if (returnNullOnMiss)
+                        return null;
+
                     throw new InvalidIdentifierError($"Symbol with the name '{symbolName}' has not been declared.");
                 }
                 else
                 {
-                    return EnclosingScope.LookUpSymbol(symbolName);
+                    return EnclosingScope.LookUpSymbol(symbolName, returnNullOnMiss);
                 }
             }
             return symbols[symbolName];

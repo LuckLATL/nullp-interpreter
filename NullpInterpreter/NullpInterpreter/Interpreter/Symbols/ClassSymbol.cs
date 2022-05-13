@@ -12,11 +12,11 @@ namespace NullPInterpreter.Interpreter.Symbols
     [DebuggerDisplay("[Class Symbol '{ToString(), nq}']")]
     public class ClassSymbol : Symbol
     {
-        public ClassDeclaration Declaration { get; set; }
+        public virtual ClassDeclaration Declaration { get; set; }
 
-        public ScopedSymbolTable ClassSymbols { get; set; }
+        public virtual ScopedSymbolTable ClassSymbols { get; set; }
 
-        public ActivationRecord ClassActivationRecord { get; set; }
+        public virtual ActivationRecord ClassActivationRecord { get; set; }
 
         public override string? ToString()
         {

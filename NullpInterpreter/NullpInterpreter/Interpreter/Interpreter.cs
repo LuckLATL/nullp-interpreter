@@ -1,4 +1,5 @@
 ﻿using NullPInterpreter.Interpreter.AST;
+using NullPInterpreter.Interpreter.BuiltIn;
 using NullPInterpreter.Interpreter.CallStackManagement;
 using NullPInterpreter.Interpreter.Symbols;
 using NullPInterpreter.Runtime;
@@ -205,32 +206,19 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitFunctionCall(FunctionCall n)
         {
             object returnValue;
+            
+            ActivationRecord ar = new ActivationRecord(n.FunctionName, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
+            CallStack.ExtendedPush(ar);
 
-            if (BuiltInFunctions.CheckIfBuiltInFunction(n.FunctionName))
+            for (int i = 0; i < n.Arguments.Count; i++)
             {
-                List<object> args = new List<object>();
-
-                foreach (var argument in n.Arguments)
-                {
-                    args.Add(Visit(argument));
-                }
-
-                returnValue = BuiltInFunctions.ExecuteBuiltInFunction(n.FunctionName, args);
+                ar.SetMember(n.FunctionSymbol.Declaration.Arguments[i].Name, Visit(n.Arguments[i]));
             }
-            else
-            {
-                ActivationRecord ar = new ActivationRecord(n.FunctionName, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
-                CallStack.ExtendedPush(ar);
 
-                for (int i = 0; i < n.Arguments.Count; i++)
-                {
-                    ar.SetMember(n.FunctionSymbol.Declaration.Arguments[i].Name, Visit(n.Arguments[i]));
-                }
-
-                Visit(n.FunctionSymbol.Declaration.Block);
-                returnValue = ar.ReturnValue;
-                CallStack.Pop();
-            }
+            Visit(n.FunctionSymbol.Declaration.Block);
+            returnValue = ar.ReturnValue;
+            CallStack.Pop();
+            
 
             return returnValue;
         }
@@ -294,6 +282,25 @@ namespace NullPInterpreter.Interpreter
                     latestSymbol = cs.ClassSymbols;
                     scopeCounter++;
                     break;
+                case VariableSymbol vs:
+
+                    object variableDef = CallStack.Peek().GetMember(vs.Name);
+
+                    switch (variableDef)
+                    {
+                        case NamespaceSymbol ns:
+                            latestSymbol = ns.NamespaceSymbols;
+                            CallStack.ExtendedPush(ns.NamespaceActivationRecord);
+                            scopeCounter++;
+                            break;
+                        case ClassSymbol cs:
+                            latestSymbol = cs.ClassSymbols;
+                            CallStack.ExtendedPush(cs.ClassActivationRecord);
+                            scopeCounter++;
+                            break;
+                    }
+                    
+                    break;
             }
 
             while (temp is NamespacePropertyCall nspc)
@@ -321,15 +328,23 @@ namespace NullPInterpreter.Interpreter
                 ActivationRecord ar = new ActivationRecord(fcall.FunctionName, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
                 FunctionSymbol funcSym = fcall.FunctionSymbol;
 
-                if (funcSym == null)
+                if (funcSym == null && latestSymbol != null)
                     funcSym = (FunctionSymbol)latestSymbol.LookUpSymbol(fcall.FunctionName);
 
                 for (int i = 0; i < funcSym.Declaration.Arguments.Count; i++)
                 {
                     ar.SetMember(funcSym.Declaration.Arguments[i].Name, Visit(fcall.Arguments[i]));
                 }
-                CallStack.ExtendedPush(ar);
 
+                if (funcSym.Declaration.Block.Children.Count != 0 && funcSym.Declaration.Block.Children[0] is AST.BuiltIn)
+                {
+                    (funcSym.Declaration.Block.Children[0] as AST.BuiltIn).Arguments.Clear();
+
+                    for (int i = 0; i < fcall.Arguments.Count; i++)
+                        (funcSym.Declaration.Block.Children[0] as AST.BuiltIn).Arguments.Add(Visit(fcall.Arguments[i]));
+                }
+
+                CallStack.ExtendedPush(ar);
                 Visit(funcSym.Declaration.Block);
                 returnValue = CallStack.Peek().ReturnValue;
                 CallStack.Pop();
@@ -412,10 +427,17 @@ namespace NullPInterpreter.Interpreter
             ActivationRecord ar = new ActivationRecord(n.ClassSymbol.Name, ActivationRecordType.Class, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
 
             ClassSymbol newInstance = new ClassSymbol() { Name = n.ClassSymbol.Name, Type = SymbolType.Class, ClassActivationRecord = ar, ClassSymbols = n.ClassSymbol.ClassSymbols, Declaration = n.ClassSymbol.Declaration };
+            
+            if (n.ClassSymbol is BuiltInClassSymbol builtInInstance)
+            {
+                newInstance = builtInInstance.New();
+                newInstance.ClassActivationRecord = ar;
+            }
+
             CallStack.ExtendedPush(ar);
             Visit(newInstance.Declaration.Block);
 
-            FunctionSymbol constructor = newInstance.ClassSymbols.LookUpSymbol(newInstance.Name) as FunctionSymbol;
+            FunctionSymbol constructor = newInstance.ClassSymbols.LookUpSymbol(newInstance.Name, true) as FunctionSymbol;
             if (constructor != null)
             {
                 ActivationRecord constructorAr = new ActivationRecord(constructor.Name, ActivationRecordType.Function, CallStack.Count == 0 ? 1 : CallStack.Peek().NestingLevel + 1);
@@ -528,6 +550,14 @@ namespace NullPInterpreter.Interpreter
                     return left && right;
             }
             return null;
+        }
+
+        protected override object VisitBuiltIn(AST.BuiltIn n)
+        {
+            object ret = n.Function.Invoke(n.Arguments);
+            CallStack.Peek().ReturnValue = ret;
+            CallStack.Peek().ShouldReturn = true;
+            return ret;
         }
     }
 }

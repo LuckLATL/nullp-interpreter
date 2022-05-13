@@ -102,6 +102,7 @@ namespace NullPInterpreter.Interpreter
             ScopedSymbolTable savedScope = CurrentScope;
 
             object callerSymbol = CurrentScope.LookUpSymbol(n.CallerName);
+            n.SourceSymbol = (Symbol)callerSymbol;
 
             
 
@@ -278,6 +279,11 @@ namespace NullPInterpreter.Interpreter
         {
             Visit(n.Left);
             Visit(n.Right);
+            return null;
+        }
+
+        protected override object VisitBuiltIn(AST.BuiltIn n)
+        {
             return null;
         }
     }
