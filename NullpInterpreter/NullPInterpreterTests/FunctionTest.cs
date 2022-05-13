@@ -23,7 +23,7 @@ namespace NullPInterpreterTests
                 }
                 
                 var calcStuff = TestFunc(5, 3);
-                WriteLine(calcStuff);
+                Console.WriteLine(calcStuff);
             ";
             CodeInterpreter.InterpretProgram(simpleProgram);
         }
