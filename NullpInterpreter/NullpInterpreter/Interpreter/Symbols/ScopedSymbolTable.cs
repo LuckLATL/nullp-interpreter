@@ -32,9 +32,6 @@ namespace NullPInterpreter.Interpreter.Symbols
             {
                 AddBuiltIn(item, this);
             }
-
-            //symbols.Add("WriteLine", new FunctionSymbol() { Name = "WriteLine", Type = SymbolType.Function });
-            //symbols.Add("ReadLine", new FunctionSymbol() { Name = "ReadLine", Type = SymbolType.Function });
             
             symbols.Add("DateTime", new NullPDateTime());
 
@@ -45,14 +42,14 @@ namespace NullPInterpreter.Interpreter.Symbols
             switch (builtIn)
             {
                 case BuiltInFunction builtInFunction:
-                    FunctionSymbol f = new FunctionSymbol() { Name = builtInFunction.Name, Type = SymbolType.Function };
+                    BuiltInFunctionSymbol f = new BuiltInFunctionSymbol() { Name = builtInFunction.Name, Type = SymbolType.Function };
                     
                     f.Declaration = new AST.FunctionDeclaration() { Block = new AST.Block(), FunctionName = f.Name };
                     f.Declaration.Block.Children.Add(new AST.BuiltIn() { Function = builtInFunction.Function });
                     parent.AddSymbol(f);
                     break;
                 case BuiltInNamespace builtInNamespace:
-                    NamespaceSymbol s = new NamespaceSymbol() { Name = builtInNamespace.Name, Type = SymbolType.Namespace };
+                    BuiltInNamespaceSymbol s = new BuiltInNamespaceSymbol() { Name = builtInNamespace.Name, Type = SymbolType.Namespace };
                     s.NamespaceActivationRecord = new CallStackManagement.ActivationRecord(builtInNamespace.Name, CallStackManagement.ActivationRecordType.Namespace, parent.ScopeLevel + 1);
                     s.NamespaceSymbols = new ScopedSymbolTable(builtInNamespace.Name, parent.ScopeLevel + 1, parent);
                     parent.AddSymbol(s);

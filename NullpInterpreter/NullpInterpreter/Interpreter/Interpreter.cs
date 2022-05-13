@@ -273,7 +273,12 @@ namespace NullPInterpreter.Interpreter
             switch (callerSymbol)
             {
                 case NamespaceSymbol ns:
-                    CallStack.ExtendedPush(ns.NamespaceActivationRecord);
+
+                    ActivationRecord nsAr = ns.NamespaceActivationRecord;
+                    if (ns is BuiltInNamespaceSymbol bnss)
+                        nsAr = new ActivationRecord(bnss.Name, ActivationRecordType.Namespace, CallStack.Peek().NestingLevel + 1) { Members = nsAr.Members};
+
+                    CallStack.ExtendedPush(nsAr);
                     latestSymbol = ns.NamespaceSymbols;
                     scopeCounter++;
                     break;
@@ -290,7 +295,12 @@ namespace NullPInterpreter.Interpreter
                     {
                         case NamespaceSymbol ns:
                             latestSymbol = ns.NamespaceSymbols;
-                            CallStack.ExtendedPush(ns.NamespaceActivationRecord);
+
+                            ActivationRecord snsAr = ns.NamespaceActivationRecord;
+                            if (ns is BuiltInNamespaceSymbol sbnss)
+                                snsAr = new ActivationRecord(sbnss.Name, ActivationRecordType.Namespace, CallStack.Peek().NestingLevel + 1) { Members = snsAr.Members };
+
+                            CallStack.ExtendedPush(snsAr);
                             scopeCounter++;
                             break;
                         case ClassSymbol cs:
@@ -309,7 +319,11 @@ namespace NullPInterpreter.Interpreter
 
                 if (calledObj is NamespaceSymbol nsym)
                 {
-                    CallStack.ExtendedPush(nsym.NamespaceActivationRecord);
+                    ActivationRecord snsAr = nsym.NamespaceActivationRecord;
+                    if (nsym is BuiltInNamespaceSymbol sbnss)
+                        snsAr = new ActivationRecord(sbnss.Name, ActivationRecordType.Namespace, CallStack.Peek().NestingLevel + 1) { Members = snsAr.Members };
+
+                    CallStack.ExtendedPush(snsAr);
                     latestSymbol = nsym.NamespaceSymbols;
                     scopeCounter++;
                 }
@@ -555,6 +569,7 @@ namespace NullPInterpreter.Interpreter
         protected override object VisitBuiltIn(AST.BuiltIn n)
         {
             object ret = n.Function.Invoke(n.Arguments);
+            n.Arguments.Clear();
             CallStack.Peek().ReturnValue = ret;
             CallStack.Peek().ShouldReturn = true;
             return ret;
