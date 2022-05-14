@@ -574,5 +574,21 @@ namespace NullPInterpreter.Interpreter
             CallStack.Peek().ShouldReturn = true;
             return ret;
         }
+
+        protected override object VisitForStatement(ForStatement n)
+        {
+            CallStack.ExtendedPush(new ActivationRecord("for", ActivationRecordType.Block, CallStack.Peek().NestingLevel + 1) { });
+
+            Visit(n.VariableDeclaration);
+            while ((bool)Visit(n.BooleanExpression))
+            {
+                Visit(n.Block);
+                Visit(n.Statement);
+            }
+
+            CallStack.Pop();
+
+            return null;
+        }
     }
 }

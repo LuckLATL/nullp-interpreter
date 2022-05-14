@@ -274,7 +274,7 @@ namespace NullPInterpreter.Interpreter
         }
 
 
-        private ASTNode Statement()
+        private ASTNode Statement(bool ignoreSemicolon = false)
         {
             ASTNode node;
             if (currentToken.Type == TokenType.BlockOpen)
@@ -284,17 +284,20 @@ namespace NullPInterpreter.Interpreter
             else if (currentToken.Type == TokenType.Word)
             {
                 node = AssigmentStatement();
-                ConsumeCurrentToken(TokenType.Semicolon);
+                if (!ignoreSemicolon)
+                    ConsumeCurrentToken(TokenType.Semicolon);
             }
             else if (currentToken.Type == TokenType.KeywordVariable)
             {
                 node = VariableDeclaration();
-                ConsumeCurrentToken(TokenType.Semicolon);
+                if (!ignoreSemicolon)
+                    ConsumeCurrentToken(TokenType.Semicolon);
             }
             else if (currentToken.Type == TokenType.FunctionCall)
             {
                 node = FunctionCall();
-                ConsumeCurrentToken(TokenType.Semicolon);
+                if (!ignoreSemicolon)
+                    ConsumeCurrentToken(TokenType.Semicolon);
             }
             else if (currentToken.Type == TokenType.KeywordNamespace)
             {
@@ -307,7 +310,8 @@ namespace NullPInterpreter.Interpreter
             else if (currentToken.Type == TokenType.NamespacePropertyCall)
             {
                 node = NamespacePropertyCall();
-                ConsumeCurrentToken(TokenType.Semicolon);
+                if (!ignoreSemicolon)
+                    ConsumeCurrentToken(TokenType.Semicolon);
             }
             else if (currentToken.Type == TokenType.KeywordIfStatement)
             {
@@ -317,10 +321,15 @@ namespace NullPInterpreter.Interpreter
             {
                 node = WhileStatement();
             }
+            else if (currentToken.Type == TokenType.KeywordFor)
+            {
+                node = ForStatement();
+            }
             else if (currentToken.Type == TokenType.KeywordReturn)
             {
                 node = ReturnStatement();
-                ConsumeCurrentToken(TokenType.Semicolon);
+                if (!ignoreSemicolon)
+                    ConsumeCurrentToken(TokenType.Semicolon);
             }
             else if (currentToken.Type == TokenType.KeywordClass)
             {
@@ -329,12 +338,14 @@ namespace NullPInterpreter.Interpreter
             else if (currentToken.Type == TokenType.Semicolon)
             {
                 node = new NoOperator();
-                ConsumeCurrentToken(TokenType.Semicolon);
+                if (!ignoreSemicolon)
+                    ConsumeCurrentToken(TokenType.Semicolon);
             }
             else if (currentToken.Type == TokenType.KeywordNew)
             {
                 node = ClassInstanceCreation();
-                ConsumeCurrentToken(TokenType.Semicolon);
+                if (!ignoreSemicolon)
+                    ConsumeCurrentToken(TokenType.Semicolon);
             }
             else
                 throw new SyntaxError(lexer.Line, lexer.LinePosition, $"Unexpected token '{TokenTypeExtension.TokenTypeToReadableString(currentToken.Type)}' found.");
@@ -349,6 +360,27 @@ namespace NullPInterpreter.Interpreter
             ConsumeCurrentToken(TokenType.LeftParenthesis);
             node.BooleanExpression = BooleanExpression();
             ConsumeCurrentToken(TokenType.RightParenthesis);
+            node.Block = (Block)Block();
+
+            return node;
+        }
+
+        private ASTNode ForStatement()
+        {
+            ForStatement node = new ForStatement();
+            ConsumeCurrentToken(TokenType.KeywordFor);
+            ConsumeCurrentToken(TokenType.LeftParenthesis);
+
+            node.VariableDeclaration = VariableDeclaration();
+            ConsumeCurrentToken(TokenType.Semicolon);
+
+            node.BooleanExpression = (BooleanExpression)BooleanExpression();
+            ConsumeCurrentToken(TokenType.Semicolon);
+
+            node.Statement = Statement(true);
+
+            ConsumeCurrentToken(TokenType.RightParenthesis);
+
             node.Block = (Block)Block();
 
             return node;

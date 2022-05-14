@@ -46,6 +46,7 @@ namespace NullPInterpreter.Interpreter
         KeywordFalse,
         KeywordNull,
         KeywordNew,
+        KeywordFor,
         LeftSquareBracket,
         RightSquareBracket,
         FunctionCall                        // Calling a function
@@ -135,6 +136,8 @@ namespace NullPInterpreter.Interpreter
                     return "|";
                 case TokenType.KeywordWhile:
                     return "while";
+                case TokenType.KeywordFor:
+                    return "for";
                 case TokenType.FunctionCall:
                     return "function call";
             }

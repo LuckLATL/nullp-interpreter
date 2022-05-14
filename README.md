@@ -200,6 +200,15 @@ while (stack.count > 0)
 }
 ```
 
+### For-Loop
+
+```JavaScript
+for (var i = 0; i < 10; i++)
+{
+    // Do something with i
+}
+```
+
 ## Static Functions
 
 ```C#

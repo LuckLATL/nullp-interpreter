@@ -68,6 +68,8 @@ namespace NullPInterpreter.Interpreter
                     return VisitTrueLiteral(n);
                 case List n:
                     return VisitList(n);
+                case ForStatement n:
+                    return VisitForStatement(n);
                 case BooleanExpressionCombination n:
                     return VisitBooleanExpressionCombination(n);
                 case Indexer n:
@@ -79,6 +81,7 @@ namespace NullPInterpreter.Interpreter
             throw new Exception("Unsupported type");
         }
 
+        protected abstract object VisitForStatement(ForStatement n);
         protected abstract object VisitBuiltIn(AST.BuiltIn n);
         protected abstract object VisitBooleanExpressionCombination(BooleanExpressionCombination n);
         protected abstract object VisitClassForwardDeclaration(ClassForwardDeclaration n);

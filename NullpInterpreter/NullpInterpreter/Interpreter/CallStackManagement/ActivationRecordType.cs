@@ -11,6 +11,7 @@ namespace NullPInterpreter.Interpreter.CallStackManagement
         Program,
         Namespace,
         Class,
-        Function
+        Function,
+        Block
     }
 }

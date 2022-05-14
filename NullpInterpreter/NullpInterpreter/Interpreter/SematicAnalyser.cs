@@ -286,5 +286,19 @@ namespace NullPInterpreter.Interpreter
         {
             return null;
         }
+
+        protected override object VisitForStatement(ForStatement n)
+        {
+            n.BlockSymbol = new BlockSymbol() { BlockSymbols = new ScopedSymbolTable("For-Loop", CurrentScope.ScopeLevel + 1, CurrentScope) };
+            CurrentScope = n.BlockSymbol.BlockSymbols;
+            Visit(n.VariableDeclaration);
+            Visit(n.BooleanExpression);
+            Visit(n.Statement);
+            Visit(n.Block);
+
+            CurrentScope = CurrentScope.EnclosingScope;
+
+            return null;
+        }
     }
 }
