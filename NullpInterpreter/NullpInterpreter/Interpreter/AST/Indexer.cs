@@ -11,5 +11,10 @@ namespace NullPInterpreter.Interpreter.AST
         public Variable Variable { get; set; }
         public int Start { get; set; }
         public int End { get; set; }
+
+        public override string? ToString()
+        {
+            return $"{Variable}[{Start}..{End}]";
+        }
     }
 }

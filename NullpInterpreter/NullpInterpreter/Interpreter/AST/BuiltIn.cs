@@ -10,5 +10,10 @@ namespace NullPInterpreter.Interpreter.AST
     {
         public Func<List<object>, object> Function;
         public List<object> Arguments = new List<object>();
+
+        public override string? ToString()
+        {
+            return $"[BuiltIn]";
+        }
     }
 }

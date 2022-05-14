@@ -10,5 +10,9 @@ namespace NullPInterpreter.Interpreter.AST
     [DebuggerDisplay("[TRUE]")]
     public class TrueLiteral : ASTNode
     {
+        public override string? ToString()
+        {
+            return $"true";
+        }
     }
 }

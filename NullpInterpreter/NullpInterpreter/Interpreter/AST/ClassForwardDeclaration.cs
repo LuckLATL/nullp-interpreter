@@ -16,5 +16,10 @@ namespace NullPInterpreter.Interpreter.AST
         {
             Name = name;
         }
+
+        public override string? ToString()
+        {
+            return $"class {Name};";
+        }
     }
 }

@@ -19,5 +19,20 @@ namespace NullPInterpreter.Interpreter.AST
         {
             FunctionName = functionName;
         }
+
+        public override string? ToString()
+        {
+            string arguments = "";
+
+            foreach (var item in Arguments)
+            {
+                arguments += $"{item.ToString()}, ";
+            }
+
+            if (arguments.Length > 0)
+                arguments = arguments.Substring(0, arguments.Length - 2);
+
+            return $"{FunctionName}({arguments})";
+        }
     }
 }

@@ -20,5 +20,10 @@ namespace NullPInterpreter.Interpreter.AST
             Operator = @operator;
             Expression = expression;
         }
+
+        public override string? ToString()
+        {
+            return $"{TokenTypeExtension.TokenTypeToReadableString(Operator.Type)}{Expression}";
+        }
     }
 }

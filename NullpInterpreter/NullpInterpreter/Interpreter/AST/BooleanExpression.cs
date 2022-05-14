@@ -13,5 +13,10 @@ namespace NullPInterpreter.Interpreter.AST
         public ASTNode Left { get; set; }
         public TokenType Operator { get; set; }
         public ASTNode Right { get; set; }
+
+        public override string? ToString()
+        {
+            return $"{Left} {TokenTypeExtension.TokenTypeToReadableString(Operator)} {Right}";
+        }
     }
 }

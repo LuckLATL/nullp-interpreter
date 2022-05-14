@@ -20,5 +20,10 @@ namespace NullPInterpreter.Interpreter.AST
             Block = block;
             Name = name;
         }
+
+        public override string? ToString()
+        {
+            return $"namespace {Name}";
+        }
     }
 }

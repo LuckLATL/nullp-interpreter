@@ -20,6 +20,12 @@ namespace NullPInterpreter.Interpreter
         public CallStack CallStack = new CallStack();
         public ActivationRecord LastProgramActivationRecord = null;
 
+        public bool EnableBreakPoints { get; set; }
+        public List<int> BreakPoints { get; set; } = new List<int>();
+        private bool isInBreakMode = false;
+        private int lastBreakpointLine = -1;
+
+
         public Interpreter(Parser parser)
         {
             Parser = parser;
@@ -35,7 +41,31 @@ namespace NullPInterpreter.Interpreter
 
         public object Interpret()
         {
+            EnableBreakPoints = true;
+            BreakPoints.Add(5);
+
             return Visit(rootNode);
+        }
+
+        public override object Visit(ASTNode node)
+        {
+            if (((EnableBreakPoints && BreakPoints.Contains(node.Line)) || isInBreakMode) && lastBreakpointLine != node.Line)
+            {
+                lastBreakpointLine = node.Line;
+                Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+                Console.WriteLine($" Line '{node.Line}' | Object '{node}'");
+                Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+                Console.WriteLine($"{CallStack.Peek()}");
+                Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+                string continueExecution = Console.ReadLine();
+
+                if (!String.IsNullOrEmpty(continueExecution))
+                    isInBreakMode = false;
+                else
+                    isInBreakMode = true;
+            }
+
+            return base.Visit(node);
         }
 
         protected override object VisitAssignmentOperator(AssignmentOperator n)

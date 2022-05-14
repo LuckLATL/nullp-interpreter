@@ -14,5 +14,10 @@ namespace NullPInterpreter.Interpreter.AST
         public string CallerName { get; set; }
         public ASTNode CalledNode { get; set; }
         public Symbol SourceSymbol { get; set; }
+
+        public override string? ToString()
+        {
+            return $"{CallerName}.{CalledNode}";
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace NullPInterpreter.Interpreter
 {
     public abstract class NodeVisitor
     {
-        public object Visit(ASTNode node)
+        public virtual object Visit(ASTNode node)
         {
             if (node == null)
                 return null;

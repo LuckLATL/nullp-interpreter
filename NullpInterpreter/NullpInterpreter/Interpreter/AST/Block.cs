@@ -13,5 +13,10 @@ namespace NullPInterpreter.Interpreter.AST
         public List<ASTNode> Children { get; set; } = new List<ASTNode>();
 
         public Block() { }
+
+        public override string? ToString()
+        {
+            return $"[Block]";
+        }
     }
 }

@@ -18,5 +18,10 @@ namespace NullPInterpreter.Interpreter.AST
         {
             Variable = variable;
         }
+
+        public override string? ToString()
+        {
+            return $"var {Variable} = {InitialDefinition};";
+        }
     }
 }

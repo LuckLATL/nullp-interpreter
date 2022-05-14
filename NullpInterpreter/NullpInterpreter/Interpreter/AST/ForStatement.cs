@@ -15,5 +15,10 @@ namespace NullPInterpreter.Interpreter.AST
         public Block Block { get; set; }
 
         public BlockSymbol BlockSymbol { get; set; }
+
+        public override string? ToString()
+        {
+            return $"for ({VariableDeclaration}; {BooleanExpression}; {Statement})";
+        }
     }
 }

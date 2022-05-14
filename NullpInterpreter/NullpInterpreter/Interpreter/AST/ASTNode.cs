@@ -6,5 +6,8 @@ using System.Threading.Tasks;
 
 namespace NullPInterpreter.Interpreter.AST
 {
-    public abstract class ASTNode { }
+    public abstract class ASTNode 
+    {
+        public int Line { get; set; }
+    }
 }

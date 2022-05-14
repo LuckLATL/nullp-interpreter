@@ -11,5 +11,11 @@ namespace NullPInterpreter.Interpreter.AST
     public class FunctionForwardDeclaration : ASTNode
     {
         public string Name { get; set; }
+
+        public override string? ToString()
+        {
+            return $"function {Name};";
+        }
+
     }
 }

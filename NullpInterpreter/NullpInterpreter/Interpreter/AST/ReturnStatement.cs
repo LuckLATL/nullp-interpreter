@@ -11,5 +11,10 @@ namespace NullPInterpreter.Interpreter.AST
     public class ReturnStatement : ASTNode
     {
         public ASTNode ReturnNode { get; set; }
+
+        public override string? ToString()
+        {
+            return $"return {ReturnNode};";
+        }
     }
 }

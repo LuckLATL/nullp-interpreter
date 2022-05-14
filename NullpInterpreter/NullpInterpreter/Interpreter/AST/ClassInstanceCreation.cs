@@ -13,5 +13,10 @@ namespace NullPInterpreter.Interpreter.AST
     {
         public ASTNode ClassToCreate { get; set; }
         public ClassSymbol ClassSymbol { get; set; }
+
+        public override string? ToString()
+        {
+            return $"{ClassSymbol.Name}()";
+        }
     }
 }

@@ -12,5 +12,10 @@ namespace NullPInterpreter.Interpreter.AST
     {
         public ASTNode BooleanExpression { get; set; }
         public Block Block { get; set; }
+
+        public override string? ToString()
+        {
+            return $"while ({BooleanExpression})";
+        }
     }
 }

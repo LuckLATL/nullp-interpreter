@@ -13,5 +13,20 @@ namespace NullPInterpreter.Interpreter.AST
         public string FunctionName { get; set; }
         public List<Argument> Arguments { get; set; } = new List<Argument>();
         public Block Block { get; set; }
+
+        public override string? ToString()
+        {
+            string arguments = "";
+
+            foreach (var item in Arguments)
+            {
+                arguments += $"{item.ToString()}, ";
+            }
+
+            if (arguments.Length > 0)
+                arguments = arguments.Substring(0, arguments.Length - 2);        
+
+            return $"function {FunctionName}({arguments})";
+        }
     }
 }

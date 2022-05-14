@@ -20,5 +20,10 @@ namespace NullPInterpreter.Interpreter.AST
             Operator = @operator;
             RightNode = rightNode;
         }
+
+        public override string? ToString()
+        {
+            return $"{LeftNode} {Operator.Value.ToString()} {RightNode}";
+        }
     }
 }

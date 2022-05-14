@@ -10,5 +10,9 @@ namespace NullPInterpreter.Interpreter.AST
     [DebuggerDisplay("[NULL]")]
     public class NullLiteral : ASTNode
     {
+        public override string? ToString()
+        {
+            return $"null";
+        }
     }
 }

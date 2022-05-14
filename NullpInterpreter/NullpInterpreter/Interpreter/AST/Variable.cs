@@ -18,5 +18,10 @@ namespace NullPInterpreter.Interpreter.AST
             Token = token;
             Name = value;
         }
+
+        public override string? ToString()
+        {
+            return $"{Name}";
+        }
     }
 }

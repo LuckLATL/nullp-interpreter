@@ -12,5 +12,10 @@ namespace NullPInterpreter.Interpreter.AST
         public Block Block { get; set; }
         public Block ElseBlock { get; set; } = new Block();
 
+        public override string? ToString()
+        {
+            return $"if ({BooleanExpression})";
+        }
+
     }
 }

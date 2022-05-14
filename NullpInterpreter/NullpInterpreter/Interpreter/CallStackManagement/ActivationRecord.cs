@@ -45,6 +45,21 @@ namespace NullPInterpreter.Interpreter.CallStackManagement
             Type = type;
             NestingLevel = nestingLevel;
         }
+
+        public override string? ToString()
+        {
+            string result = "";
+
+            if (PreviousRecord != null)
+                result += PreviousRecord.ToString();
+
+            foreach (var item in Members)
+            {
+                result += $"{item.Key} | {item.Value}\n";
+            }
+
+            return result;
+        }
     }
 
     
