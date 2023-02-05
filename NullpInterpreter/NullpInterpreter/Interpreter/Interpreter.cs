@@ -1,6 +1,7 @@
 ﻿using NullPInterpreter.Interpreter.AST;
 using NullPInterpreter.Interpreter.BuiltIn;
 using NullPInterpreter.Interpreter.CallStackManagement;
+using NullPInterpreter.Interpreter.Events;
 using NullPInterpreter.Interpreter.Symbols;
 using NullPInterpreter.Runtime;
 using System;
@@ -23,7 +24,9 @@ namespace NullPInterpreter.Interpreter
         public bool EnableBreakPoints { get; set; }
         public List<int> BreakPoints { get; set; } = new List<int>();
         private bool isInBreakMode = false;
-        private int lastBreakpointLine = -1;
+
+        public delegate void BreakpointHitEventHandler(object sender, BreakpointHitEventArgs e);
+        public event BreakpointHitEventHandler OnBreakPointHit;
 
 
         public Interpreter(Parser parser)
@@ -42,27 +45,22 @@ namespace NullPInterpreter.Interpreter
         public object Interpret()
         {
             EnableBreakPoints = true;
-            BreakPoints.Add(5);
+            
 
             return Visit(rootNode);
         }
 
+        public void Continue(bool continueExecution = false)
+        {
+            isInBreakMode = !continueExecution;
+        }
+
         public override object Visit(ASTNode node)
         {
-            if (((EnableBreakPoints && BreakPoints.Contains(node.Line)) || isInBreakMode) && lastBreakpointLine != node.Line)
+            if ((EnableBreakPoints && BreakPoints.Contains(node.Line) || isInBreakMode) && node is not AST.BuiltIn)
             {
-                lastBreakpointLine = node.Line;
-                Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-                Console.WriteLine($" Line '{node.Line}' | Object '{node}'");
-                Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-                Console.WriteLine($"{CallStack.Peek()}");
-                Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-                string continueExecution = Console.ReadLine();
-
-                if (!String.IsNullOrEmpty(continueExecution))
-                    isInBreakMode = false;
-                else
-                    isInBreakMode = true;
+                isInBreakMode = true;
+                OnBreakPointHit?.Invoke(this, new BreakpointHitEventArgs(node, CallStack));
             }
 
             return base.Visit(node);

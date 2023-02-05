@@ -9,5 +9,6 @@ namespace NullPInterpreter.Interpreter.AST
     public abstract class ASTNode 
     {
         public int Line { get; set; }
+        public int Character { get; set; }
     }
 }

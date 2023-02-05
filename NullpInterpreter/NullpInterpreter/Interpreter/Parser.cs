@@ -73,7 +73,7 @@ namespace NullPInterpreter.Interpreter
             {
                 Token token = currentToken;
                 ConsumeCurrentToken(currentToken.Type);
-                result = new BinaryOperator(result, token, Term()) { Line = lexer.Line };
+                result = new BinaryOperator(result, token, Term()) { Line = lexer.Line, Character = lexer.LinePosition };
             }
 
             return result;
@@ -90,7 +90,7 @@ namespace NullPInterpreter.Interpreter
             {
                 Token token = currentToken;
                 ConsumeCurrentToken(token.Type);
-                result = new BinaryOperator(result, token, Factor()) { Line = lexer.Line };
+                result = new BinaryOperator(result, token, Factor()) { Line = lexer.Line, Character = lexer.LinePosition };
             }
 
             return result;
@@ -107,19 +107,19 @@ namespace NullPInterpreter.Interpreter
             if (token.Type == TokenType.Plus)
             {
                 ConsumeCurrentToken(TokenType.Plus);
-                ASTNode node = new UnaryOperator(token, Factor()) { Line = lexer.Line };
+                ASTNode node = new UnaryOperator(token, Factor()) { Line = lexer.Line, Character = lexer.LinePosition };
                 return node;
             }
             else if (token.Type == TokenType.Minus)
             {
                 ConsumeCurrentToken(TokenType.Minus);
-                ASTNode node = new UnaryOperator(token, Factor()) { Line = lexer.Line };
+                ASTNode node = new UnaryOperator(token, Factor()) { Line = lexer.Line, Character = lexer.LinePosition };
                 return node;
             }
             else if (token.Type == TokenType.IntegerLiteral)
             {
                 ConsumeCurrentToken(TokenType.IntegerLiteral);
-                return new IntegerLiteral(Double.Parse(token.Value.ToString())) { Line = lexer.Line };
+                return new IntegerLiteral(Double.Parse(token.Value.ToString())) { Line = lexer.Line, Character = lexer.LinePosition };
             }
             else if (token.Type == TokenType.LeftParenthesis)
             {
@@ -195,7 +195,7 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode List()
         {
-            AST.List list = new AST.List() { Line = lexer.Line };
+            AST.List list = new AST.List() { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.LeftSquareBracket);
 
             if (currentToken.Type != TokenType.RightSquareBracket)
@@ -217,12 +217,12 @@ namespace NullPInterpreter.Interpreter
         private ASTNode NullLiteral()
         {
             ConsumeCurrentToken(TokenType.KeywordNull);
-            return new NullLiteral() { Line = lexer.Line };
+            return new NullLiteral() { Line = lexer.Line, Character = lexer.LinePosition };
         }
 
         private ASTNode Variable()
         {
-            ASTNode node = new Variable(currentToken, currentToken.Value.ToString()) { Line = lexer.Line };
+            ASTNode node = new Variable(currentToken, currentToken.Value.ToString()) { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.Word);
 
             if (currentToken.Type == TokenType.LeftSquareBracket)
@@ -237,7 +237,7 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode Indexer()
         {
-            Indexer indexer = new Indexer() { Line = lexer.Line };
+            Indexer indexer = new Indexer() { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.LeftSquareBracket);
 
             indexer.Start = Convert.ToInt32(currentToken.Value);
@@ -261,14 +261,14 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode Argument()
         {
-            ASTNode node = new Argument(currentToken, currentToken.Value.ToString()) { Line = lexer.Line };
+            ASTNode node = new Argument(currentToken, currentToken.Value.ToString()) { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.Word);
             return node;
         }
 
         public ASTNode StringLiteral()
         {
-            ASTNode node = new StringLiteral(currentToken.Value.ToString()) { Line = lexer.Line };
+            ASTNode node = new StringLiteral(currentToken.Value.ToString()) { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.StringLiteral);
             return node;
         }
@@ -337,7 +337,7 @@ namespace NullPInterpreter.Interpreter
             }
             else if (currentToken.Type == TokenType.Semicolon)
             {
-                node = new NoOperator() { Line = lexer.Line };
+                node = new NoOperator() { Line = lexer.Line, Character = lexer.LinePosition };
                 if (!ignoreSemicolon)
                     ConsumeCurrentToken(TokenType.Semicolon);
             }
@@ -355,7 +355,7 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode WhileStatement()
         {
-            WhileStatement node = new WhileStatement() { Line = lexer.Line };
+            WhileStatement node = new WhileStatement() { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.KeywordWhile);
             ConsumeCurrentToken(TokenType.LeftParenthesis);
             node.BooleanExpression = BooleanExpression();
@@ -367,7 +367,7 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode ForStatement()
         {
-            ForStatement node = new ForStatement() { Line = lexer.Line };
+            ForStatement node = new ForStatement() { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.KeywordFor);
             ConsumeCurrentToken(TokenType.LeftParenthesis);
 
@@ -395,12 +395,12 @@ namespace NullPInterpreter.Interpreter
             ASTNode classNode = null;
             if (currentToken.Type == TokenType.Semicolon)
             {
-                classNode = new ClassForwardDeclaration(className) { Line = lexer.Line };
+                classNode = new ClassForwardDeclaration(className) { Line = lexer.Line, Character = lexer.LinePosition };
             }
             else
             {
                 int line = lexer.Line;
-                classNode = new ClassDeclaration((Block)Block(), className) { Line = line };
+                classNode = new ClassDeclaration((Block)Block(), className) { Line = line, Character = lexer.LinePosition };
             }
 
             
@@ -411,7 +411,7 @@ namespace NullPInterpreter.Interpreter
         {
             ConsumeCurrentToken(TokenType.KeywordNew);
 
-            ClassInstanceCreation node = new ClassInstanceCreation() { Line = lexer.Line };
+            ClassInstanceCreation node = new ClassInstanceCreation() { Line = lexer.Line, Character = lexer.LinePosition };
 
             if (currentToken.Type == TokenType.NamespacePropertyCall)
                 node.ClassToCreate = NamespacePropertyCall();
@@ -427,7 +427,7 @@ namespace NullPInterpreter.Interpreter
 
             if (currentToken.Type == TokenType.Word) // Function forward declaration
             {
-                FunctionForwardDeclaration node = new FunctionForwardDeclaration() { Line = lexer.Line };
+                FunctionForwardDeclaration node = new FunctionForwardDeclaration() { Line = lexer.Line, Character = lexer.LinePosition };
                 node.Name = currentToken.Value.ToString();
                 ConsumeCurrentToken(TokenType.Word);
                 ConsumeCurrentToken(TokenType.Semicolon);
@@ -435,7 +435,7 @@ namespace NullPInterpreter.Interpreter
             }
             else
             {
-                FunctionDeclaration node = new FunctionDeclaration() { Line = lexer.Line };
+                FunctionDeclaration node = new FunctionDeclaration() { Line = lexer.Line, Character = lexer.LinePosition };
                 node.FunctionName = currentToken.Value.ToString();
                 ConsumeCurrentToken(TokenType.FunctionCall);
                 ConsumeCurrentToken(TokenType.LeftParenthesis);
@@ -457,7 +457,7 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode IfStatement()
         {
-            IfStatement node = new IfStatement() { Line = lexer.Line };
+            IfStatement node = new IfStatement() { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.KeywordIfStatement);
             ConsumeCurrentToken(TokenType.LeftParenthesis);
             node.BooleanExpression = BooleanExpression();
@@ -475,7 +475,7 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode BooleanExpression()
         {
-            BooleanExpression node = new BooleanExpression() { Line = lexer.Line };
+            BooleanExpression node = new BooleanExpression() { Line = lexer.Line, Character = lexer.LinePosition };
 
             node.Left = Expression();
             node.Operator = currentToken.Type;
@@ -516,7 +516,7 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode ReturnStatement()
         {
-            ReturnStatement node = new ReturnStatement() { Line = lexer.Line };
+            ReturnStatement node = new ReturnStatement() { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.KeywordReturn);
             node.ReturnNode = Expression();
             return node;
@@ -528,7 +528,7 @@ namespace NullPInterpreter.Interpreter
             List<ASTNode> nodes = StatementList();
             ConsumeCurrentToken(TokenType.BlockClose);
 
-            Block root = new Block() { Line = lexer.Line };
+            Block root = new Block() { Line = lexer.Line, Character = lexer.LinePosition };
             foreach (ASTNode subNode in nodes)
             {
                 root.Children.Add(subNode);
@@ -555,26 +555,26 @@ namespace NullPInterpreter.Interpreter
                 ConsumeCurrentToken(TokenType.Plus);
                 ConsumeCurrentToken(TokenType.Plus);
 
-                right = new BinaryOperator(left, new Token(TokenType.Plus, '+'), new IntegerLiteral(1)) { Line = lexer.Line };
+                right = new BinaryOperator(left, new Token(TokenType.Plus, '+'), new IntegerLiteral(1)) { Line = lexer.Line, Character = lexer.LinePosition };
             }
             else if (currentToken.Type == TokenType.Minus)
             {
                 ConsumeCurrentToken(TokenType.Minus);
                 ConsumeCurrentToken(TokenType.Minus);
 
-                right = new BinaryOperator(left, new Token(TokenType.Minus, '-'), new IntegerLiteral(1)) { Line = lexer.Line };
+                right = new BinaryOperator(left, new Token(TokenType.Minus, '-'), new IntegerLiteral(1)) { Line = lexer.Line, Character = lexer.LinePosition };
             }
 
-            node = new AssignmentOperator(left, token, right) { Line = lexer.Line };
+            node = new AssignmentOperator(left, token, right) { Line = lexer.Line, Character = lexer.LinePosition };
             return node;
         }
 
         private VariableDeclaration VariableDeclaration()
         {
             ConsumeCurrentToken(TokenType.KeywordVariable);
-            Variable variable = new Variable(currentToken, currentToken.Value.ToString()) { Line = lexer.Line };
+            Variable variable = new Variable(currentToken, currentToken.Value.ToString()) { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.Word);
-            VariableDeclaration declaration = new VariableDeclaration(variable) { Line = lexer.Line };
+            VariableDeclaration declaration = new VariableDeclaration(variable) { Line = lexer.Line, Character = lexer.LinePosition };
 
             if (currentToken.Type == TokenType.Assign)
             {
@@ -587,7 +587,7 @@ namespace NullPInterpreter.Interpreter
 
         private ASTNode FunctionCall()
         {
-            FunctionCall call = new FunctionCall(currentToken.Value.ToString()) { Line = lexer.Line };
+            FunctionCall call = new FunctionCall(currentToken.Value.ToString()) { Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.FunctionCall);
             ConsumeCurrentToken(TokenType.LeftParenthesis);
 
@@ -603,7 +603,7 @@ namespace NullPInterpreter.Interpreter
         }
         private ASTNode NamespacePropertyCall()
         {
-            NamespacePropertyCall call = new NamespacePropertyCall() { CallerName = currentToken.Value.ToString(), Line = lexer.Line };
+            NamespacePropertyCall call = new NamespacePropertyCall() { CallerName = currentToken.Value.ToString(), Line = lexer.Line, Character = lexer.LinePosition };
             ConsumeCurrentToken(TokenType.NamespacePropertyCall);
             ConsumeCurrentToken(TokenType.Dot);
             
@@ -627,7 +627,7 @@ namespace NullPInterpreter.Interpreter
             ConsumeCurrentToken(TokenType.KeywordNamespace);
             string namespaceName = currentToken.Value.ToString();
             ConsumeCurrentToken(TokenType.Word);
-            NamespaceDeclaration namespaceNode = new NamespaceDeclaration((Block)Block(), namespaceName) { Line = lexer.Line };
+            NamespaceDeclaration namespaceNode = new NamespaceDeclaration((Block)Block(), namespaceName) { Line = lexer.Line, Character = lexer.LinePosition };
             return namespaceNode;
         }
 

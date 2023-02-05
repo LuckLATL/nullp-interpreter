@@ -1,8 +1,10 @@
 ﻿using NullPInterpreter.Interpreter;
 using NullPInterpreter.Interpreter.AST;
+using NullPInterpreter.Interpreter.CallStackManagement;
 using NullPInterpreter.Interpreter.Exceptions;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace NullPInterpreter
 {
@@ -34,6 +36,8 @@ namespace NullPInterpreter
                     WriteStatusToConsole(stopwatch);
 
                     Interpreter.Interpreter interpreter = new Interpreter.Interpreter(p);
+
+                    interpreter.OnBreakPointHit += Interpreter_OnBreakPointHit;
 
                     Console.Write(" Sematic Analyser\t\t");
                     interpreter.SematicAnalysis(rootNode);
@@ -78,6 +82,20 @@ namespace NullPInterpreter
                 Console.ReadLine();
             }
 
+        }
+
+        private static void Interpreter_OnBreakPointHit(object sender, Interpreter.Events.BreakpointHitEventArgs e)
+        {
+            Console.WriteLine("Breakpoint Hit!");
+            Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            Console.WriteLine($" Location '{e.CurrentNode.Line}:{e.CurrentNode.Character}' | Object '{e.CurrentNode}'");
+            Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+            Console.WriteLine($"{e.Callstack.Peek()}");
+            Console.WriteLine("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+
+            Console.ReadLine();
+
+            (sender as Interpreter.Interpreter).Continue();
         }
 
         private static void WriteStatusToConsole(Stopwatch sw)
