@@ -184,13 +184,13 @@ namespace NullPInterpreter.Interpreter
         private ASTNode FalseLiteral()
         {
             ConsumeCurrentToken(TokenType.KeywordFalse);
-            return new FalseLiteral();
+            return new FalseLiteral() { Line = lexer.Line, Character = lexer.LinePosition };
         }
 
         private ASTNode TrueLiteral()
         {
             ConsumeCurrentToken(TokenType.KeywordTrue);
-            return new TrueLiteral();
+            return new TrueLiteral() { Line = lexer.Line, Character = lexer.LinePosition };
         }
 
         private ASTNode List()

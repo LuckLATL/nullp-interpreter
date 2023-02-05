@@ -24,6 +24,7 @@ namespace NullPInterpreter.Interpreter
         public bool EnableBreakPoints { get; set; }
         public List<int> BreakPoints { get; set; } = new List<int>();
         private bool isInBreakMode = false;
+        private bool stepOne = false;
 
         public delegate void BreakpointHitEventHandler(object sender, BreakpointHitEventArgs e);
         public event BreakpointHitEventHandler OnBreakPointHit;
@@ -52,15 +53,24 @@ namespace NullPInterpreter.Interpreter
 
         public void Continue(bool continueExecution = false)
         {
-            isInBreakMode = !continueExecution;
+            isInBreakMode = false;
+        }
+
+        public void StepOne(bool continueExecution = false)
+        {
+            isInBreakMode = false;
+            stepOne = true;
         }
 
         public override object Visit(ASTNode node)
         {
-            if ((EnableBreakPoints && BreakPoints.Contains(node.Line) || isInBreakMode) && node is not AST.BuiltIn)
+            if ((EnableBreakPoints && BreakPoints.Contains(node.Line) || isInBreakMode || stepOne) && node is not AST.BuiltIn)
             {
+                stepOne = false;
                 isInBreakMode = true;
                 OnBreakPointHit?.Invoke(this, new BreakpointHitEventArgs(node, CallStack));
+
+                while (!stepOne || isInBreakMode) { }
             }
 
             return base.Visit(node);
